@@ -64,7 +64,6 @@ gnome-software
 gnome-text-editor
 gnome-tour
 gnome-tweaks
-gnu-netcat
 gpart
 gpm
 gptfdisk
@@ -131,7 +130,6 @@ pv
 qemu-guest-agent
 refind
 reflector
-reiserfsprogs
 rp-pppoe
 rsync
 rxvt-unicode-terminfo
