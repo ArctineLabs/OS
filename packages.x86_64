@@ -102,6 +102,7 @@ mission-center
 mkinitcpio
 mkinitcpio-archiso
 mkinitcpio-nfs-utils
+mmc-utils
 modemmanager
 mtools
 nano
@@ -160,6 +161,7 @@ wireless_tools
 wireless-regdb
 wpa_supplicant
 wvdial
+xdg-utils
 xdg-user-dirs
 xfsprogs
 xl2tpd
