@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Build script for ArctineOS
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+case $1 in
+	clean)
+		rm $SCRIPT_DIR/tmp/* -rfv
+	;;
+	clean-out)
+		rm $SCRIPT_DIR/out/* -vfr
+	;;
+	prep)
+		mkdir $SCRIPT_DIR/tmp -v
+	;;
+	build)
+		mkarchiso -v -w $SCRIPT_DIR/tmp/archiso-tmp -o $SCRIPT_DIR/out $SCRIPT_DIR
+	;;
+	*)
+		echo "Unknown command: $1"
+	;;
+esac
+

@@ -1,0 +1,5 @@
+root:x:0:root
+adm:x:4:arctine
+wheel:x:10:arctine
+uucp:x:14:arctine
+arctine:x:1000:

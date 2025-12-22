@@ -1,0 +1,12 @@
+[Unit]
+Description=Compile GLib schemas
+DefaultDependencies=no
+Before=graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+[Install]
+WantedBy=graphical.target
+
