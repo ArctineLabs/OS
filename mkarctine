@@ -4,6 +4,26 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+gen.filelist() { # Generate file list
+	pushd $SCRIPT_DIR/airootfs
+		find * > filelist 2>/dev/null
+		sed -i 's|^|/run/archiso/airootfs/|' filelist
+	popd
+}
+
+gen.filelist.wopasswd() { # Same as above, without gshadow, shadow, passwd or group
+	pushd $SCRIPT_DIR/airootfs
+		find * \
+			! -path "etc/passwd" \
+			! -path "etc/group" \
+			! -path "etc/shadow" \
+			! -path "etc/gshadow" > filelist 2>/dev/null
+		sed -i 's|^|/run/archiso/airootfs/|' filelist
+	popd
+}
+
+# Main argument handler(?)
+
 case $1 in
 	clean)
 		rm $SCRIPT_DIR/tmp/* -rfv
@@ -17,8 +37,40 @@ case $1 in
 	build)
 		mkarchiso -v -w $SCRIPT_DIR/tmp/archiso-tmp -o $SCRIPT_DIR/out $SCRIPT_DIR
 	;;
+	gen)
+		case $2 in
+			filelist)
+				gen.filelist
+			;;
+			filelist-wo-passwd)
+				gen.filelist.wopasswd
+			;;
+			*)
+				echo "Specify what to generate from: filelist, filelist-wo-passwd"
+			;;
+		esac
+	;;
+	help)
+		echo "
+clean                    Cleans the tmp folder
+
+clean-out                Cleans the out folder
+
+prep                     Prepares for build
+
+build                    Build ISO
+
+gen filelist             Generate a list of files
+
+gen filelist-wo-passwd   Generate a list of files
+                         without including password 
+			 or user related files"
+	;;
 	*)
-		echo "Unknown command: $1"
+		echo "Unknown command: $1
+		Maybe try help?"
 	;;
 esac
+
+
 

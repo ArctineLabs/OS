@@ -1,0 +1,13 @@
+[Unit]
+Description=Compile and update dconf system database
+DefaultDependencies=no
+Before=display-manager.service graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/dconf compile /etc/dconf/db/local /etc/dconf/db/local.d
+ExecStart=/usr/bin/dconf update
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,9 @@
+[org.gnome.desktop.interface]
+accent-color='purple'
+font-name='Inter 11'
+document-font-name='Inter 12'
+monospace-font-name='Adwaita Mono 11'
+
+[org.gnome.shell]
+enabled-extensions=['copyous@boerdereinar.dev', 'dash-to-panel@jderose9.github.com', 'arcmenu@arcmenu.com', 'gsconnect@andyholmes.github.io', 'ding@rastersoft.com', 'appindicatorsupport@rgcjonas.gmail.com', 'add-to-desktop@tommimon.github.com', 'blur-my-shell@aunetx', 'tilingshell@ferrarodomenico.com', 'lockscreen-extension@pratap.fastmail.fm']
+
