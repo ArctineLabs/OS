@@ -32,7 +32,7 @@ case $1 in
 		rm $SCRIPT_DIR/out/* -vfr
 	;;
 	prep)
-		mkdir $SCRIPT_DIR/tmp -v
+		mkdir $SCRIPT_DIR/tmp $SCRIPT_DIR/out -v
 	;;
 	build)
 		mkarchiso -v -w $SCRIPT_DIR/tmp/archiso-tmp -o $SCRIPT_DIR/out $SCRIPT_DIR
