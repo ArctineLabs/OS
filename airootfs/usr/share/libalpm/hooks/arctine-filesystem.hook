@@ -1,0 +1,9 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = filesystem
+[Action]
+Description = Install Arctine filesystem files to replace
+When = PostTransaction
+Exec = /Arctine/Scripts/hookhelper filesystem 
