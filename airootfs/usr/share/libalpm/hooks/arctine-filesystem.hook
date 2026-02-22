@@ -4,6 +4,7 @@ Operation = Upgrade
 Type = Package
 Target = filesystem
 Target = /usr/share/plymouth/themes/spinner/
+Target = plymouth
 [Action]
 Description = Install Arctine filesystem files to replace
 When = PostTransaction
