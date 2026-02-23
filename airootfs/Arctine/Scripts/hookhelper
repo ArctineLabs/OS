@@ -19,7 +19,7 @@ error() {
 }
 
 hook.filesystem() {
-	mv -vf /Arctine/Filesystem/Replace/usr/share/pixmaps/* /usr/share/pixmaps/ || error 6
+	cp -vr /Arctine/Filesystem/Replace/* / || error 6
 }
 
 main() {
