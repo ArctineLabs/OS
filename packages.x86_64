@@ -51,8 +51,10 @@ gpm
 gptfdisk
 grml-zsh-config
 grub
+grub-btrfs
 hdparm
 hyperv
+inotify-tools
 intel-ucode
 inter-font
 irssi
@@ -65,7 +67,8 @@ less
 lftp
 libfido2
 libusb-compat
-linux
+linux-zen
+linux-zen-headers
 linux-atm
 linux-firmware
 linux-firmware-marvell
@@ -123,6 +126,8 @@ sdparm
 sequoia-sq
 sg3_utils
 smartmontools
+snapper
+snap-pac
 sof-firmware
 squashfs-tools
 sudo

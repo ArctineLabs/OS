@@ -1,0 +1,18 @@
+pkgname=betriebssystem
+pkgver=26
+pkgrel=1
+pkgdesc="ArctineOS system configuration"
+arch=('any')
+url="https://github.com/ArctineLabs/OS"
+license=('GPL3')
+depends=('base' 'gnome-shell' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager')
+sha256sums=('SKIP')
+md5sums=('SKIP')
+
+package() {
+    cp $srcdir/../../airootfs/etc $pkgdir/etc -rv
+    cp $srcdir/../../airootfs/usr $pkgdir/usr -rv
+    cp $srcdir/../../airootfs/Arctine $pkgdir/Arctine -rv
+    rm -rv $pkgdir/Arctine/LiveISO
+    rm -rv $pkgdir/etc/passwd
+}

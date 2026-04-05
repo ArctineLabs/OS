@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = systemd
+Target = networkmanager
+[Action]
+Description = Enable and start certain ArctineOS units
+When = PostTransaction
+Exec = /Arctine/Scripts/hookhelper units

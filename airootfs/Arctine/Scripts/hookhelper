@@ -10,6 +10,10 @@ error() {
 			echo "Error with hook.filesystem()!"
 			exit 1
 		;;
+		21)
+			echo "Error with hook.units()!"
+			exit 1
+		;;
 		*)
 			echo "Unknown error code $1!"
 			exit 1
@@ -22,10 +26,17 @@ hook.filesystem() {
 	cp -vr /Arctine/Filesystem/Replace/* / || error 6
 }
 
+hook.units() {
+	systemctl enable --now NetworkManager || error 21
+}
+
 main() {
 	case $1 in
 		filesystem)
 			hook.filesystem
+		;;
+		units)
+			hook.units
 		;;
 		*)
 			echo "Unknown hook: $1"

@@ -1,0 +1,9 @@
+This is the package for ArctineOS' configuration.
+
+Signing does not work, run the command like this:
+
+makepkg -sr --nosign --skipchecksums
+
+Make sure you are in the same directory as this one when running makepkg
+
+This depends on the parent directory, the Git repository ArctineLabs/OS, do not move it outside of it, it will not work.
