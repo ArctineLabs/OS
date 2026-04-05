@@ -67,6 +67,8 @@ less
 lftp
 libfido2
 libusb-compat
+linux
+linux-headers
 linux-zen
 linux-zen-headers
 linux-atm
