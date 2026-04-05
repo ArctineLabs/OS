@@ -2,3 +2,5 @@ out
 tmp
 Ignore
 plus
+arctine-pkg/pkg
+arctine-pkg/*.zst
