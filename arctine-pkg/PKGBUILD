@@ -15,4 +15,12 @@ package() {
     cp $srcdir/../../airootfs/Arctine $pkgdir/Arctine -rv
     rm -rv $pkgdir/Arctine/LiveISO
     rm -rv $pkgdir/etc/passwd
+    rm -rv $pkgdir/etc/group
+    rm -rv $pkgdir/etc/gshadow
+    rm -rv $pkgdir/etc/locale.conf
+    rm -rv $pkgdir/etc/localtime
+    rm -rv $pkgdir/etc/resolv.conf
+    rm -rv $pkgdir/etc/shadow
+    rm -rv $pkgdir/etc/systemd/system/dbus-org.freedesktop.timesync1.service
+    rm -rv $pkgdir/etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service
 }

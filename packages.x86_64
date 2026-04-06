@@ -17,6 +17,7 @@ cloud-init
 cryptsetup
 darkhttpd
 ddrescue
+debugedit
 dhclient
 dhcpcd
 diffutils
@@ -33,6 +34,7 @@ ethtool
 exfatprogs
 extension-manager
 f2fs-tools
+fakeroot
 fatresize
 firefox
 foot-terminfo
