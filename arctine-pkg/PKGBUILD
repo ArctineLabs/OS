@@ -1,6 +1,6 @@
 pkgname=betriebssystem
 pkgver=26
-pkgrel=1
+pkgrel=2
 pkgdesc="ArctineOS system configuration"
 arch=('any')
 url="https://github.com/ArctineLabs/OS"
@@ -21,6 +21,8 @@ package() {
     rm -rv $pkgdir/etc/localtime
     rm -rv $pkgdir/etc/resolv.conf
     rm -rv $pkgdir/etc/shadow
+    rm -rv $pkgdir/etc/hostname
+    rm -rv $pkgdir/etc/mkinitcpio.d/linux.preset
     rm -rv $pkgdir/etc/systemd/system/dbus-org.freedesktop.timesync1.service
     rm -rv $pkgdir/etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service
 }
