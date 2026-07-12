@@ -1,5 +1,8 @@
 #!/bin/bash
 
+pacman-key --init
+pacman-key --populate archlinux
+
 # shellcheck disable=SC2164
 pushd /OS/arctine-pkg
     chown nobody:nobody -Rv .
@@ -14,6 +17,8 @@ hwclock --systohc
 
 systemctl enable NetworkManager
 systemctl enable gdm
+
+pacman -R mkinitcpio mkinitcpio-archiso
 
 snapper create-config /
 
