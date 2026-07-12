@@ -102,12 +102,6 @@ installation() {
     # shellcheck disable=SC2046
     installation_spinner "Installing packages to target installation..." --show-output -- pacstrap -K /mnt $(cat /mnt/OS/packages.x86_64)
     installation_spinner "Generating fstab..." --show-output -- genfstab -U /mnt >> /mnt/etc/fstab
-    # shellcheck disable=SC2164
-    pushd /mnt/OS/arctine-pkg
-        installation_spinner "Building package..." --show-output -- sudo -u nobody makepkg -sr
-        installation_spinner "Installing Milanium..." --show-output -- sudo pacman --root /mnt -U ./milanium-*.pkg.tar.zst
-    # shellcheck disable=SC2164
-    popd
     cp /Arctine/GumpackNG/setup.sh /mnt/setup.sh -v;chmod +x /mnt/setup.sh
     echo "Copying chroot setup to target system..."
     echo "Entering target system..."
