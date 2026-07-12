@@ -13,6 +13,7 @@ hwclock --systohc
 /Arctine/Scripts/hookhelper filesystem
 
 systemctl enable NetworkManager
+systemctl enable gdm
 
 snapper create-config /
 
