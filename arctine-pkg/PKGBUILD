@@ -6,8 +6,6 @@ arch=('any')
 url="https://github.com/ArctineLabs/OS"
 license=('GPL3')
 depends=('base' 'gnome-shell' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager' 'dracut' 'pkgfile' 'gum')
-sha256sums=('SKIP')
-md5sums=('SKIP')
 install=${pkgname}.install
 replaces=('betriebssystem')
 

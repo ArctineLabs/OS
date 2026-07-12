@@ -2,14 +2,17 @@
 
 # shellcheck disable=SC2164
 pushd /OS/arctine-pkg
+    chown nobody:nobody -Rv .
     sudo -u nobody makepkg -sr
-    sudo pacman -Uv ./milanium-*.pkg.tar.zst
+    pacman -Uv ./milanium-*.pkg.tar.zst
 # shellcheck disable=SC2164
 popd
 
 hwclock --systohc
 
 /Arctine/Scripts/hookhelper filesystem
+
+snapper create-config /
 
 dracut --force
 
@@ -26,7 +29,7 @@ chmod 440 /etc/sudoers.d/10-wheel
 visudo -c
 
 read -rp "Enter username for new user: " Username
-usermod -aG wheel "$Username"
+useradd -m -G wheel "$Username"
 
 while ! passwd "$Username"; do
     echo "Try again"
