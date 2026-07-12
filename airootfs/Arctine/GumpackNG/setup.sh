@@ -12,6 +12,8 @@ hwclock --systohc
 
 /Arctine/Scripts/hookhelper filesystem
 
+systemctl enable NetworkManager
+
 snapper create-config /
 
 dracut --force

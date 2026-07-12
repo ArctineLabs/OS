@@ -108,6 +108,7 @@ installation() {
     echo "Entering target system..."
     echo "$Installer_PathToBootPartition" >> /mnt/bootpart.txt
     arch-chroot /mnt /setup.sh
+    ending
 }
 
 ending() {
