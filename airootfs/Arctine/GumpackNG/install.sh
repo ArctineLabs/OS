@@ -217,7 +217,7 @@ partitioning.select() {
 partitioning.custom.process() {
     gum spin --spinner points --title "Formatting $Installer_PathToRootPartition..." --show-error -- mkfs.btrfs -f "$Installer_PathToRootPartition" || bail "Failed to format root partition..."
     if [[ $Installer_FormatEFI ]]; then
-        gum spin --spinner points --title "Formatting $Installer_PathToBootPartition..." --show-error -- mkfs.fat -f -F 32 "$Installer_PathToBootPartition" || bail "Failed to format boot partition..."
+        gum spin --spinner points --title "Formatting $Installer_PathToBootPartition..." --show-error -- mkfs.fat -F 32 "$Installer_PathToBootPartition" || bail "Failed to format boot partition..."
     fi
     export Installer_PartitioningCustom_Selection_Done=true
 }
