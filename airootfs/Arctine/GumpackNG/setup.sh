@@ -2,6 +2,7 @@
 
 pacman-key --init
 pacman-key --populate archlinux
+pacman -S dracut
 
 # shellcheck disable=SC2164
 pushd /OS/arctine-pkg

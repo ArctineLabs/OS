@@ -101,7 +101,7 @@ installation() {
     installation_spinner "Cloning ArctineOS source..." -- git clone https://github.com/ArctineLabs/OS /mnt/OS
     # shellcheck disable=SC2046
     echo "Installing packages to target system..."; sleep 0.5
-    pacstrap -K /mnt $(cat /mnt/OS/packages.x86_64)
+    pacstrap -K /mnt "$(cat /mnt/OS/packages.x86_64)"
     installation_spinner "Generating fstab..." --show-output -- genfstab -U /mnt >> /mnt/etc/fstab
     cp /Arctine/GumpackNG/setup.sh /mnt/setup.sh -v;chmod +x /mnt/setup.sh
     echo "Copying chroot setup to target system..."
