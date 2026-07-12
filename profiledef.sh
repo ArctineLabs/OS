@@ -29,5 +29,6 @@ file_permissions=(
   ["/usr/share"]="0:0:755"
   ["/usr/share/glib-2.0"]="0:0:755"
   ["/Arctine/Scripts/hookhelper"]="0:0:755"
+  ["/Arctine/GumpackNG/install.sh"]="0:0:755"
   ["/Arctine/LiveISO"]="0:0:755"
 )

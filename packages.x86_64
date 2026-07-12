@@ -52,6 +52,7 @@ gptfdisk
 grml-zsh-config
 grub
 grub-btrfs
+gum
 hdparm
 hyperv
 inotify-tools
@@ -113,7 +114,7 @@ partclone
 parted
 partimage
 pcsclite
-plymouth
+pkgfile
 ppp
 pptpclient
 pv
