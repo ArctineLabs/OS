@@ -220,6 +220,7 @@ partitioning.custom.process() {
         gum spin --spinner points --title "Formatting $Installer_PathToBootPartition..." --show-error -- mkfs.fat -F 32 "$Installer_PathToBootPartition" || bail "Failed to format boot partition..."
     fi
     export Installer_PartitioningCustom_Selection_Done=true
+    export Installer_PartitioningDone=true
 }
 
 # Disregard
