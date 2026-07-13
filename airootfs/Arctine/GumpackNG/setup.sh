@@ -2,13 +2,13 @@
 
 pacman-key --init
 pacman-key --populate archlinux
-pacman -S dracut
+pacman -S dracut --noconfirm
 
 # shellcheck disable=SC2164
 pushd /OS/arctine-pkg
     chown nobody:nobody -Rv .
     sudo -u nobody makepkg -sr
-    pacman -Uv ./milanium-*.pkg.tar.zst
+    pacman -Uv ./milanium-*.pkg.tar.zst --noconfirm
 # shellcheck disable=SC2164
 popd
 
@@ -19,7 +19,7 @@ hwclock --systohc
 systemctl enable NetworkManager
 systemctl enable gdm
 
-pacman -R mkinitcpio mkinitcpio-archiso
+pacman -R mkinitcpio mkinitcpio-archiso --noconfirm
 
 snapper create-config /
 
