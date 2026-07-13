@@ -47,7 +47,7 @@ checkrequirements() {
     ## Check if installation is even possible
 
     case $InstallerRequirements_JudgementScore in
-        3|7)
+        3|5)
             InstallerRequirements_CanInstall=yes
         ;;
         1|2|4)
@@ -95,7 +95,8 @@ checkrequirements() {
         ;;
         no)
             echo "The requirements have not been met and the installer cannot continue."
-            read -rp "Press [ENTER] to exit." 
+            read -rp "Press [ENTER] to exit."
+            exit 1
         ;;
     esac
 }
