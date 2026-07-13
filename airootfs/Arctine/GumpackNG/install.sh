@@ -7,6 +7,101 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+# Eligible or not?
+
+export InstallerRequirements_BootMode=
+export InstallerRequirements_BootMode_Judgement=
+export InstallerRequirements_Memory=
+export InstallerRequirements_Memory_Judgement=
+export InstallerRequirements_BootMode=
+export InstallerRequirements_JudgementScore=0
+export InstallerRequirements_CanInstall=no
+
+checkrequirements() {
+    # Get system information
+
+    ## BootMode
+    if [[ -d /sys/firmware/efi ]]; then
+        InstallerRequirements_BootMode=UEFI
+        InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 1))
+        InstallerRequirements_BootMode_Judgement="GOOD"
+    else
+        InstallerRequirements_BootMode=BIOS
+        InstallerRequirements_BootMode_Judgement="BAD"
+    fi
+
+    ## Memory
+    InstallerRequirements_Memory=$(free --giga | awk '/^Mem:/{print $2}')
+    if [[ $InstallerRequirements_Memory -gt 3 ]]; then
+        if [[ $InstallerRequirements_Memory -gt 7 ]]; then
+            InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 4))
+            InstallerRequirements_Memory_Judgement="GOOD"
+        else
+            InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 2))
+            InstallerRequirements_Memory_Judgement="OK"
+        fi
+    else
+            InstallerRequirements_Memory_Judgement="BAD"
+    fi
+
+    ## Check if installation is even possible
+
+    case $InstallerRequirements_JudgementScore in
+        3|7)
+            InstallerRequirements_CanInstall=yes
+        ;;
+        1|2|4)
+            InstallerRequirements_CanInstall=no
+        ;;
+    esac
+
+    gum format -- "# System requirements" \
+        "- Mode booted: $InstallerRequirements_BootMode ($InstallerRequirements_BootMode_Judgement)" \
+        "- RAM: $InstallerRequirements_Memory GB ($InstallerRequirements_Memory_Judgement)" \
+        "- Network connection (will be setup later)" \
+        "- 20GB free storage"
+
+    case $InstallerRequirements_Memory_Judgement in
+        GOOD)
+            echo "PASS: The installed RAM is above the recommended amount ($InstallerRequirements_Memory GB > 8 GB)"
+        ;;
+        OK)
+            echo "WARN: The recommended amount of installed RAM is 8 GB. While $InstallerRequirements_Memory GB is supported, performance may be limited."
+        ;;
+        BAD)
+            echo "FAIL: The installed RAM does not meet the minimum requirement of 4 GB RAM installed, and the installer can not continue."
+        ;;
+    esac
+
+    case $InstallerRequirements_BootMode_Judgement in
+        GOOD)
+            echo "PASS: The system is booted in UEFI mode. The installation can continue."
+        ;;
+        BAD)
+            echo "FAIL: The system is booted in BIOS mode. For now, installing ArctineOS on legacy BIOS systems is not supported by this installer."
+        ;;
+    esac
+
+    case $InstallerRequirements_CanInstall in
+        yes)
+            case $(gum choose --header "Acknowledge info and continue installation?" "Yes" "No") in
+                Yes)
+                    true
+                ;;
+                No)
+                    exit 1
+                ;;
+            esac
+        ;;
+        no)
+            echo "The requirements have not been met and the installer cannot continue."
+            read -rp "Press [ENTER] to exit." 
+        ;;
+    esac
+}
+
+checkrequirements
+
 # Variables
 
 export Color_Off='\033[0m'       # Text Reset
@@ -131,7 +226,7 @@ network.test() {
     export Installer_NetworkConnected_Ping=0
     # gum spin --spinner points --title "Testing connection to Google..." -- ping google.com -c 1 || echo "Could not establish a connection to Google."
     gum spin --spinner points --title "Testing connection to GitHub..." -- ping github.com -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1)) || echo "Could not establish a connection to GitHub."
-    gum spin --spinner points --title "Testing connection to archlinux.org..." -- ping archlinux.org -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))  || echo "Could not establish a connection to archlinux.org."
+#    gum spin --spinner points --title "Testing connection to archlinux.org..." -- ping archlinux.org -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))  || echo "Could not establish a connection to archlinux.org."
 }
 
 network.fix() {
