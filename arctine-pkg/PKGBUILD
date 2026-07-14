@@ -24,4 +24,6 @@ package() {
     rm -rv $pkgdir/etc/mkinitcpio.d/linux.preset
     rm -rv $pkgdir/etc/systemd/system/dbus-org.freedesktop.timesync1.service
     rm -rv $pkgdir/etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service
+    rm -rv $pkgdir/etc/systemd/system/pacman-init.service
+    rm -rv $pkgdir/etc/systemd/system/etc-pacman.d-gnupg.mount
 }
