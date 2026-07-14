@@ -227,7 +227,7 @@ network.test() {
     export Installer_NetworkConnected_Ping=0
     # gum spin --spinner points --title "Testing connection to Google..." -- ping google.com -c 1 || echo "Could not establish a connection to Google."
     gum spin --spinner points --title "Testing connection to GitHub..." -- ping github.com -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1)) || echo "Could not establish a connection to GitHub."
-#    gum spin --spinner points --title "Testing connection to archlinux.org..." -- ping archlinux.org -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))  || echo "Could not establish a connection to archlinux.org."
+    gum spin --spinner points --title "Testing connection to gnu.org..." -- ping gnu.org -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))  || echo "Could not establish a connection to gnu.org."
 }
 
 network.fix() {

@@ -1,8 +1,12 @@
 #!/bin/bash
 
+# This script is a big mess, I might clean it up later on...
+
 pacman-key --init
 pacman-key --populate archlinux
 pacman -S dracut --noconfirm
+
+git config --global --add safe.directory /OS
 
 # shellcheck disable=SC2164
 pushd /OS/arctine-pkg
