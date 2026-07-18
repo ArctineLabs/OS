@@ -202,6 +202,8 @@ installation() {
     pacstrap -K /mnt $(cat /mnt/OS/packages.x86_64)
     installation_spinner "Generating fstab..." --show-output -- genfstab -U /mnt >> /mnt/etc/fstab
     cp /Arctine/GumpackNG/setup.sh /mnt/setup.sh -v;chmod +x /mnt/setup.sh
+    installation_spinner "Creating subvolume for snapshots..." -- btrfs subvolume create /mnt/.snapshots
+    installation_spinner "Creating Snapper config for snapshots..." -- snapper --root=/mnt create-config /
     echo "Copying chroot setup to target system..."
     echo "Entering target system..."
     echo "$Installer_PathToBootPartition" >> /mnt/bootpart.txt

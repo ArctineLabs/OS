@@ -25,8 +25,6 @@ systemctl enable gdm
 
 pacman -R mkinitcpio mkinitcpio-archiso --noconfirm
 
-snapper create-config /
-
 dracut --force
 
 if cat /sys/firmware/efi/fw_platform_size; then
