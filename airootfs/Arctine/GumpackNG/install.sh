@@ -180,6 +180,7 @@ By choosing \"Install now\", the root partition will be formatted (all data eras
         ;;
         "Back to partitioning")
             export Installer_PartitioningDone=false
+            export Installer_PartitioningCustom_Selection_Done=false
             partitioning
         ;;
         *)
@@ -194,7 +195,7 @@ installation() {
         gum spin --spinner points --title "$@"
     }
     installation_spinner "Mounting root partition..." -- mount "$Installer_PathToRootPartition" /mnt
-    installation_spinner "Mounting root partition..." -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir
+    installation_spinner "Mounting boot partition..." -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir
     installation_spinner "Cloning ArctineOS source..." -- git clone https://github.com/ArctineLabs/OS /mnt/OS
     # shellcheck disable=SC2046
     echo "Installing packages to target system..."; sleep 0.5
