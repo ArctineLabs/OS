@@ -40,6 +40,7 @@ fsarchiver
 git
 gnome
 gnome-browser-connector
+gnome-initial-setup
 gnome-shell
 gnome-shell-extension-appindicator
 gnome-shell-extension-arc-menu
