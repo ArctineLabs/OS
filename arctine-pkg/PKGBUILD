@@ -1,11 +1,11 @@
 pkgname=milanium
 pkgver=26
-pkgrel=3
+pkgrel=4
 pkgdesc="ArctineOS system configuration"
 arch=('any')
 url="https://github.com/ArctineLabs/OS"
 license=('GPL3')
-depends=('base' 'gnome-shell' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager' 'dracut' 'pkgfile' 'gum')
+depends=('junction' 'base' 'gnome-shell' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager' 'dracut' 'pkgfile' 'gum')
 replaces=('betriebssystem')
 
 package() {
