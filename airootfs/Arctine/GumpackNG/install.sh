@@ -3,7 +3,7 @@
 # Root or not?
 
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
+  then echo -e "Please run the installer with administrative permissions (using root).\nBitte führen Sie den Installer mit Administratorrechten aus.\nSvp, exécutez l'installateur en tant qu'administrateur."
   exit
 fi
 
@@ -203,8 +203,8 @@ installation() {
     pacstrap -K /mnt $(cat /mnt/OS/packages.x86_64)
     installation_spinner "Generating fstab..." --show-output -- genfstab -U /mnt >> /mnt/etc/fstab
     cp /Arctine/GumpackNG/setup.sh /mnt/setup.sh -v;chmod +x /mnt/setup.sh
-    installation_spinner "Creating subvolume for snapshots..." -- btrfs subvolume create /mnt/.snapshots
-    installation_spinner "Creating Snapper config for snapshots..." -- snapper --root=/mnt create-config /
+#   installation_spinner "Creating subvolume for snapshots..." -- btrfs subvolume create /mnt/.snapshots
+#   installation_spinner "Creating Snapper config for snapshots..." -- snapper --root=/mnt create-config /
     echo "Copying chroot setup to target system..."
     echo "Entering target system..."
     echo "$Installer_PathToBootPartition" >> /mnt/bootpart.txt

@@ -75,6 +75,11 @@ systemctl enable NetworkManager
 limsg s 1 i "Enabling GNOME Display Manager..."
 systemctl enable gdm
 
+limsg s 1 i "Setting up Snapper snapshots..."
+btrfs subvolume delete /.snapshots || true
+rm /.snapshots || true
+snapper create-config /
+
 limsg s 1 i "Removing now obsolete mkinitcpio..."
 pacman -R mkinitcpio mkinitcpio-archiso --noconfirm
 
