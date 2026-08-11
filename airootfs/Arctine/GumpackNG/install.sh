@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Root or not?
-
-if [ "$EUID" -ne 0 ]
-  then echo -e "Please run the installer with administrative permissions (using root).\nBitte führen Sie den Installer mit Administratorrechten aus.\nSvp, exécutez l'installateur en tant qu'administrateur."
-  exit
-fi
-
 # Eligible or not?
 
 export InstallerRequirements_BootMode=
@@ -17,33 +10,65 @@ export InstallerRequirements_BootMode=
 export InstallerRequirements_JudgementScore=0
 export InstallerRequirements_CanInstall=no
 
+# Get system information
+
+## BootMode
+
+if [[ -d /sys/firmware/efi ]]; then
+    InstallerRequirements_BootMode=UEFI
+    InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 1))
+    InstallerRequirements_BootMode_Judgement="GOOD"
+else
+    InstallerRequirements_BootMode=BIOS
+    InstallerRequirements_BootMode_Judgement="BAD"
+fi
+
+## Memory
+
+InstallerRequirements_Memory=$(free --giga | awk '/^Mem:/{print $2}')
+if [[ $InstallerRequirements_Memory -gt 3 ]]; then
+    if [[ $InstallerRequirements_Memory -gt 7 ]]; then
+        InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 4))
+        InstallerRequirements_Memory_Judgement="GOOD"
+    else
+        InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 2))
+        InstallerRequirements_Memory_Judgement="OK"
+    fi
+else
+        InstallerRequirements_Memory_Judgement="BAD"
+fi
+
+# Root or not?
+
+if [ "$EUID" -ne 0 ]
+  then echo -e "Please run the installer with administrative permissions (using root).\nBitte führen Sie den Installer mit Administratorrechten aus.\nSvp, exécutez l'installateur en tant qu'administrateur."
+  exit
+fi
+
+
+#WIP
+
+case $(gum choose --header "Language:" "English" "Deutsch" "Français" "Español/Castellano") in #"Debug from source"
+    "English")
+        source /Arctine/Library/Translations/GumpackNG/install/en.arctinelocale
+    ;;
+    "Français")
+        source /Arctine/Library/Translations/GumpackNG/install/fr.arctinelocale
+    ;;
+    "Deutsch")
+        source /Arctine/Library/Translations/GumpackNG/install/de.arctinelocale
+    ;;
+    "Español/Castellano")
+        source /Arctine/Library/Translations/GumpackNG/install/es.arctinelocale
+    ;;
+    *)
+        exit 1
+    ;;
+esac
+
+
+
 checkrequirements() {
-    # Get system information
-
-    ## BootMode
-    if [[ -d /sys/firmware/efi ]]; then
-        InstallerRequirements_BootMode=UEFI
-        InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 1))
-        InstallerRequirements_BootMode_Judgement="GOOD"
-    else
-        InstallerRequirements_BootMode=BIOS
-        InstallerRequirements_BootMode_Judgement="BAD"
-    fi
-
-    ## Memory
-    InstallerRequirements_Memory=$(free --giga | awk '/^Mem:/{print $2}')
-    if [[ $InstallerRequirements_Memory -gt 3 ]]; then
-        if [[ $InstallerRequirements_Memory -gt 7 ]]; then
-            InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 4))
-            InstallerRequirements_Memory_Judgement="GOOD"
-        else
-            InstallerRequirements_JudgementScore=$((InstallerRequirements_JudgementScore + 2))
-            InstallerRequirements_Memory_Judgement="OK"
-        fi
-    else
-            InstallerRequirements_Memory_Judgement="BAD"
-    fi
-
     ## Check if installation is even possible
 
     case $InstallerRequirements_JudgementScore in
@@ -55,47 +80,47 @@ checkrequirements() {
         ;;
     esac
 
-    gum format -- "# System requirements" \
-        "- Mode booted: $InstallerRequirements_BootMode ($InstallerRequirements_BootMode_Judgement)" \
-        "- RAM: $InstallerRequirements_Memory GB ($InstallerRequirements_Memory_Judgement)" \
-        "- Network connection (will be setup later)" \
-        "- 20GB free storage"
+    gum format -- "# $arlo_GumpackNG_checkrequirements_SystemRequirements" \
+        "- $arlo_GumpackNG_checkrequirements_BootedMode: $InstallerRequirements_BootMode ($InstallerRequirements_BootMode_Judgement)" \
+        "- $arlo_GumpackNG_checkrequirements_RAM: $InstallerRequirements_Memory $arlo_GumpackNG_checkrequirements_GB ($InstallerRequirements_Memory_Judgement)" \
+        "- $arlo_GumpackNG_checkrequirements_Network" \
+        "- $arlo_GumpackNG_checkrequirements_20GBFreeStorage"
 
     case $InstallerRequirements_Memory_Judgement in
         GOOD)
-            echo "PASS: The installed RAM is above the recommended amount ($InstallerRequirements_Memory GB > 8 GB)"
+            echo "$arlo_GumpackNG_checkrequirements_Judgement_Memory_Good ($InstallerRequirements_Memory $arlo_GumpackNG_checkrequirements_GB > 8 $arlo_GumpackNG_checkrequirements_GB)"
         ;;
         OK)
-            echo "WARN: The recommended amount of installed RAM is 8 GB. While $InstallerRequirements_Memory GB is supported, performance may be limited."
+            arlo_GumpackNG_checkrequirements_Judgement_Memory_Ok
         ;;
         BAD)
-            echo "FAIL: The installed RAM does not meet the minimum requirement of 4 GB RAM installed, and the installer can not continue."
+            echo "$arlo_GumpackNG_checkrequirements_Judgement_Memory_Bad"
         ;;
     esac
 
     case $InstallerRequirements_BootMode_Judgement in
         GOOD)
-            echo "PASS: The system is booted in UEFI mode. The installation can continue."
+            echo "$arlo_GumpackNG_checkrequirements_Judgement_Boot_Good"
         ;;
         BAD)
-            echo "FAIL: The system is booted in BIOS mode. For now, installing ArctineOS on legacy BIOS systems is not supported by this installer."
+            echo "$arlo_GumpackNG_checkrequirements_Judgement_Boot_Bad"
         ;;
     esac
 
     case $InstallerRequirements_CanInstall in
         yes)
-            case $(gum choose --header "Acknowledge info and continue installation?" "Yes" "No") in
-                Yes)
+            case $(gum choose --header "$arlo_GumpackNG_checkrequirements_Accept" "$arlo_GumpackNG_Yes" "$arlo_GumpackNG_No") in
+                "$arlo_GumpackNG_Yes")
                     true
                 ;;
-                No)
+                "$arlo_GumpackNG_No")
                     exit 1
                 ;;
             esac
         ;;
         no)
-            echo "The requirements have not been met and the installer cannot continue."
-            read -rp "Press [ENTER] to exit."
+            echo "$arlo_GumpackNG_checkrequirements_Fail"
+            read -rp "$arlo_GumpackNG_checkrequirements_Fail_EnterToExit"
             exit 1
         ;;
     esac
@@ -123,7 +148,7 @@ export Installer_PartitioningCustom_Selection_Done=false
 # Core
 
 main() {
-    if [[ $(gum choose --header "Welcome to the ArctineOS installer." "Continue" "Exit") == "Continue" ]]; then
+    if [[ $(gum choose --header "$arlo_GumpackNG_Welcome_Header" "$arlo_GumpackNG_Welcome_Continue" "$arlo_GumpackNG_Welcome_Exit") == "$arlo_GumpackNG_Welcome_Continue" ]]; then
         modules
     else
         exit
@@ -155,7 +180,7 @@ clock() {
 partitioning() {
     while ! $Installer_PartitioningDone; do
 #       export Installer_Partitioning_Method=$(gum choose --header "How would you like to install?" --label-delimiter=":" "Erase a disk and install ArctineOS:erase" "Custom Installation:custom" "Quit installer:exit")
-        Installer_Partitioning_Method=$(gum choose --header "How would you like to install?" --label-delimiter=":" "Partition disk and install ArctineOS:custom" "Quit installer:exit")
+        Installer_Partitioning_Method=$(gum choose --header "$arlo_GumpackNG_Partitioning_InstallMethodSelection" --label-delimiter=":" "$arlo_GumpackNG_Partitioning_InstallMethodSelection_Custom:custom" "$arlo_GumpackNG_Partitioning_InstallMethodSelection_Exit:exit")
         case $Installer_Partitioning_Method in
             custom)
                 partitioning.custom
@@ -169,22 +194,21 @@ partitioning() {
 }
 
 confirm() {
-    echo "You are about to start the installation process.
+    echo "$arlo_GumpackNG_InstallConfirm_Header
     
-By choosing \"Install now\", the root partition will be formatted (all data erased) and if enabled, the EFI partition will too.
-(pressing [ESCAPE] will exit the installer and cancel the installation process.)"
-    Installer_Confirm=$(gum choose --header "Install?" "Install now" "Back to partitioning")
+$arlo_GumpackNG_InstallConfirm_Details"
+    Installer_Confirm=$(gum choose --header "$arlo_GumpackNG_InstallConfirm_Header" "$arlo_GumpackNG_InstallConfirm_Install" "$arlo_GumpackNG_InstallConfirm_Back")
     case "$Installer_Confirm" in
-        "Install now")
+        "$arlo_GumpackNG_InstallConfirm_Install")
             installation
         ;;
-        "Back to partitioning")
+        "$arlo_GumpackNG_InstallConfirm_Back")
             export Installer_PartitioningDone=false
             export Installer_PartitioningCustom_Selection_Done=false
             partitioning
         ;;
         *)
-            echo "Exiting..."
+            echo "$arlo_GumpackNG_InstallConfirm_Exiting"
             exit 1
         ;;
     esac
@@ -194,31 +218,31 @@ installation() {
     installation_spinner() {
         gum spin --spinner points --title "$@"
     }
-    installation_spinner "Mounting root partition..." -- mount "$Installer_PathToRootPartition" /mnt
-    installation_spinner "Mounting boot partition..." -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir
-    installation_spinner "Cloning ArctineOS source..." -- git clone https://github.com/ArctineLabs/OS /mnt/OS
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount "$Installer_PathToRootPartition" /mnt
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingBootPartition" -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir
+    installation_spinner "$arlo_GumpackNG_Installation_Process_CloningSource" -- git clone https://github.com/ArctineLabs/OS /mnt/OS
     # shellcheck disable=SC2046
-    echo "Installing packages to target system..."; sleep 0.5
+    echo "$arlo_GumpackNG_Installation_Process_Packages"; sleep 0.5
     # shellcheck disable=SC2046
     pacstrap -K /mnt $(cat /mnt/OS/packages.x86_64)
-    installation_spinner "Generating fstab..." --show-output -- genfstab -U /mnt >> /mnt/etc/fstab
+    installation_spinner "$arlo_GumpackNG_Installation_Process_fstabGeneration" --show-output -- genfstab -U /mnt >> /mnt/etc/fstab
     cp /Arctine/GumpackNG/setup.sh /mnt/setup.sh -v;chmod +x /mnt/setup.sh
 #   installation_spinner "Creating subvolume for snapshots..." -- btrfs subvolume create /mnt/.snapshots
 #   installation_spinner "Creating Snapper config for snapshots..." -- snapper --root=/mnt create-config /
-    echo "Copying chroot setup to target system..."
-    echo "Entering target system..."
+    echo "$arlo_GumpackNG_Installation_Process_CopyInstaller"
+    echo "$arlo_GumpackNG_Installation_Process_EnterChroot"
     echo "$Installer_PathToBootPartition" >> /mnt/bootpart.txt
     arch-chroot /mnt /setup.sh
     ending
 }
 
 ending() {
-    case $(gum choose --header "Installation finished successfully!" "Reboot now" "Exit Installer") in
-        "Reboot now")
+    case $(gum choose --header "$arlo_GumpackNG_Installation_End_Header" "$arlo_GumpackNG_Installation_End_Reboot" "$arlo_GumpackNG_Installation_End_ExitInstaller") in
+        "$arlo_GumpackNG_Installation_End_Reboot")
             umount -R /mnt || true
             systemctl reboot || reboot
         ;;
-        "Exit Installer"|*)
+        "$arlo_GumpackNG_Installation_End_ExitInstaller"|*)
             exit
         ;;
     esac
@@ -229,12 +253,12 @@ ending() {
 network.test() {
     export Installer_NetworkConnected_Ping=0
     # gum spin --spinner points --title "Testing connection to Google..." -- ping google.com -c 1 || echo "Could not establish a connection to Google."
-    gum spin --spinner points --title "Testing connection to GitHub..." -- ping github.com -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1)) || echo "Could not establish a connection to GitHub."
-    gum spin --spinner points --title "Testing connection to gnu.org..." -- ping gnu.org -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))  || echo "Could not establish a connection to gnu.org."
+    gum spin --spinner points --title "$arlo_GumpackNG_Network_Test_Loading GitHub..." -- ping github.com -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1)) || echo "$arlo_GumpackNG_Network_Test_Fail GitHub."
+    gum spin --spinner points --title "$arlo_GumpackNG_Network_Test_Loading gnu.org..." -- ping gnu.org -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))  ||  echo "$arlo_GumpackNG_Network_Test_Fail gnu.org."
 }
 
 network.fix() {
-    Installer_Network_Selection=$(gum choose --header "Your device failed to establish a connection to GitHub or archlinux.org. Choose an option below:" --label-delimiter=":" "Retry:retry" "Open Network Settings:settings")
+    Installer_Network_Selection=$(gum choose --header "$arlo_GumpackNG_Network_Fix_Header" --label-delimiter=":" "$arlo_GumpackNG_Network_Fix_Retry:retry" "$arlo_GumpackNG_Network_Fix_Settings:settings")
     case "$Installer_Network_Selection" in
         retry)
             true
@@ -243,7 +267,7 @@ network.fix() {
             gnome-control-center network
         ;;
         *)
-            echo "Nothing selected, retrying anyways..."
+            echo "$arlo_GumpackNG_Network_Fix_NoOption"
         ;;
     esac
 }
@@ -257,11 +281,8 @@ partitioning.automatic.process() {
 }
 
 partitioning.custom() {
-    echo "The system needs at least:
-- one boot partition (needs to be FAT32)
-- one root partition (needs to be btrfs) (where the actual system resides)
-- optionally, swap"
-    Installer_PartitioningCustom_Selection=$(gum choose --header "Custom Install options:" --label-delimiter=":" "1. Modify disk:diskutility"  "2. Select partitions to use (boot, swap, root):select")
+    echo "$arlo_GumpackNG_Partitioning_Custom"
+    Installer_PartitioningCustom_Selection=$(gum choose --header "$arlo_GumpackNG_Partitioning_Custom_Header" --label-delimiter=":" "$arlo_GumpackNG_Partitioning_Custom_ModifyDisk:diskutility"  "$arlo_GumpackNG_Partitioning_Custom_SelectPartitions:select")
     case "$Installer_PartitioningCustom_Selection" in
         diskutility)
             gnome-disks
@@ -278,25 +299,25 @@ partitioning.custom() {
 
 partitioning.select() {
     while ! $Installer_PartitioningCustom_Selection_Done; do
-        echo "Enter full path of the boot and root partitions:"
+        echo $arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths
         lsblk -pno "NAME,SIZE,TYPE,FSTYPE" | grep "part"
-        Installer_PathToBootPartition=$(gum input --placeholder "boot partition (e.g. /dev/sda1, /dev/nvme0n1p1...)")
-        Installer_PathToRootPartition=$(gum input --placeholder "root partition (e.g. /dev/sda2, /dev/nvme0n1p2...)")
-        if gum confirm "Format boot partition? (Do not do this if it already existed before install)";then
+        Installer_PathToBootPartition=$(gum input --placeholder "$arlo_GumpackNG_Partitioning_Select_BootPartitionPlaceholder")
+        Installer_PathToRootPartition=$(gum input --placeholder "$arlo_GumpackNG_Partitioning_Select_RootPartitionPlaceholder")
+        if gum confirm "$arlo_GumpackNG_Partitioning_Select_FormatBootPartition";then
             export Installer_FormatEFI=true
         else
             export Installer_FormatEFI=false
         fi
 
-        echo "Confirm the changes, as your partitions are going to be wiped.
-            Details:
-            Selected root partition | $Installer_PathToRootPartition
-            Selected boot partition | $Installer_PathToBootPartition
-            Format EFI? (boot part) | $Installer_FormatEFI"
-        echo "To confirm and make changes to these partitions, type \"Confirm\" with capital C. To cancel and make any other changes, type anything else."
+        echo "$arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header
+            "$arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Details"
+            $arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedRootPartition | $Installer_PathToRootPartition
+            $arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedBootPartition | $Installer_PathToBootPartition
+            $arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedBootPartition | $Installer_FormatEFI"
+        echo $arlo_GumpackNG_Partitioning_Select_ConfirmWipe_ConfirmText
         Installer_PartitioningCustom_Selection_Confirm=$(gum input)
         case "$Installer_PartitioningCustom_Selection_Confirm" in
-            "Confirm")
+            "$arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Confirm")
                 export Installer_PartitioningCustom_Selection_Done=true
                 partitioning.custom.process
             ;;
@@ -312,15 +333,15 @@ partitioning.select() {
 }
 
 partitioning.custom.process() {
-    gum spin --spinner points --title "Formatting $Installer_PathToRootPartition..." --show-error -- mkfs.btrfs -f "$Installer_PathToRootPartition" || bail "Failed to format root partition..."
+    gum spin --spinner points --title "$arlo_GumpackNG_Partitioning_Custom_Process_Formatting $Installer_PathToRootPartition..." --show-error -- mkfs.btrfs -f "$Installer_PathToRootPartition" || bail "$arlo_GumpackNG_bail_Error_RootPart"
     if [[ $Installer_FormatEFI ]]; then
-        gum spin --spinner points --title "Formatting $Installer_PathToBootPartition..." --show-error -- mkfs.fat -F 32 "$Installer_PathToBootPartition" || bail "Failed to format boot partition..."
+        gum spin --spinner points --title "$arlo_GumpackNG_Partitioning_Custom_Process_Formatting $Installer_PathToBootPartition..." --show-error -- mkfs.fat -F 32 "$Installer_PathToBootPartition" || bail "$arlo_GumpackNG_bail_Error_BootPart"
     fi
     export Installer_PartitioningCustom_Selection_Done=true
     export Installer_PartitioningDone=true
 }
 
 # Disregard
-bail() { echo -e "${BRed}ERROR: Installer failed with the following message:${Color_Off} $1"; read -rp "[ENTER]"; exit 1; }
+bail() { echo -e "${BRed}${arlo_GumpackNG_bail}${Color_Off} $1"; read -rp "$arlo_GumpackNG_bail_ENTER"; exit 1; }
 
 main
