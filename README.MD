@@ -26,6 +26,12 @@ GNOME Extensions (found under airootfs/usr/share/gnome-shell/extensions/):
 
 The rest of the projects should have their licenses in the final filesystem.
 
+# Translations
+
+To translate, copy the respective en.arctinelocale file and change the "en" to the code of the language you want to translate a component into.
+
+The .arctinelocale files in question can be found under directories in the [Arctine Translations Library](https://github.com/ArctineLabs/OS/tree/main/airootfs/Arctine/Library/Translations/) under directories within.
+
 # Other
 > Old readme
 Hi, this is just a dummy README for now, if you want to build this config, clone the repo, cd to it, make an "out" dir, and run (as root):

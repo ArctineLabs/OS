@@ -48,17 +48,17 @@ fi
 
 #WIP
 
-case $(gum choose --header "Language:" "English" "Deutsch" "Français" "Español/Castellano") in #"Debug from source"
-    "English")
+case $(gum choose --header "Language:" --label-delimiter=":" "English:en" "Deutsch:de" "Français (Incomplet):fr" "Español/Castellano (Inacabado):es") in #"Debug from source"
+    "en")
         source /Arctine/Library/Translations/GumpackNG/install/en.arctinelocale
     ;;
-    "Français")
+    "fr")
         source /Arctine/Library/Translations/GumpackNG/install/fr.arctinelocale
     ;;
-    "Deutsch")
+    "de")
         source /Arctine/Library/Translations/GumpackNG/install/de.arctinelocale
     ;;
-    "Español/Castellano")
+    "es")
         source /Arctine/Library/Translations/GumpackNG/install/es.arctinelocale
     ;;
     *)
