@@ -57,6 +57,10 @@ git config --global --add safe.directory /OS
 # shellcheck disable=SC2164
 pushd /OS/arctine-pkg
     chown nobody:nobody -Rv .
+    limsg s 1 i "Installing Milanium dependencies..."
+    source PKGBUILD
+    # shellcheck disable=SC2154
+    pacman -S "${depends[@]}" --noconfirm
     limsg s 1 i "Making Milanium..."
     sudo -u nobody makepkg -sr
     limsg s 1 i "Installing Milanium..."
@@ -76,9 +80,12 @@ limsg s 1 i "Enabling GNOME Display Manager..."
 systemctl enable gdm
 
 limsg s 1 i "Setting up Snapper snapshots..."
-btrfs subvolume delete /.snapshots || true
-rm /.snapshots || true
+umount /.snapshots || true
+rmdir /.snapshots || true
 snapper create-config /
+btrfs subvolume delete /.snapshots
+mkdir /.snapshots
+mount /.snapshots
 
 limsg s 1 i "Removing now obsolete mkinitcpio..."
 pacman -R mkinitcpio mkinitcpio-archiso --noconfirm

@@ -20,7 +20,7 @@ arlo_GumpackNG_checkrequirements_Judgement_Memory_Ok() {
 arlo_GumpackNG_checkrequirements_Judgement_Memory_Bad="FAIL: Der installierte Arbeitsspeicher erfüllt nicht die Mindestanforderung von 4 GB, und die Installation kann deswegen nicht fortgesetzt werden."
 arlo_GumpackNG_checkrequirements_Accept="Akzeptieren und mit Installation fortfahren?"
 arlo_GumpackNG_checkrequirements_Fail="Die Systemanforderungen wurden nicht erfüllt, und die Installation kann deswegen nicht fortgesetzt werden."
-arlo_GumpackNG_checkrequirements_Fail_EnterToExit="Drücke [ENTER], um das Installationsprogramm zu schliessen."
+arlo_GumpackNG_checkrequirements_Fail_EnterToExit="Drücken Sie [ENTER], um das Installationsprogramm zu schliessen."
 
 arlo_GumpackNG_Welcome_Header="Willkommen zum ArctineOS-Installationsprogramm."
 arlo_GumpackNG_Welcome_Continue="Fortsetzen"
@@ -28,12 +28,12 @@ arlo_GumpackNG_Welcome_Exit="Beenden"
 
 arlo_GumpackNG_Network_Test_Loading="Verbindung zum Server wird getestet:"
 arlo_GumpackNG_Network_Test_Fail="Es konnte keine Verbindung mit dem folgenden Server hergestellt werden:"
-arlo_GumpackNG_Network_Fix_Header="Dein Gerät konnte sich nicht mit den zwei Server verbinden. Wähle eine Option aus:"
+arlo_GumpackNG_Network_Fix_Header="Ihr Gerät konnte sich nicht mit den zwei Server verbinden. Wählen Sie eine Option aus:"
 arlo_GumpackNG_Network_Fix_Retry="Erneut versuchen"
 arlo_GumpackNG_Network_Fix_Settings="Netzwerkeinstellungen öffnen"
 arlo_GumpackNG_Network_Fix_NoOption="Keine Option wurde ausgewählt, es wird trotzdem erneut versucht..."
 
-arlo_GumpackNG_Partitioning_InstallMethodSelection="Wie möchtest du mit der Installation fortsetzen?"
+arlo_GumpackNG_Partitioning_InstallMethodSelection="Wie möchten Sie mit der Installation fortsetzen?"
 arlo_GumpackNG_Partitioning_InstallMethodSelection_Custom="Festplatte partitionieren und ArctineOS installieren"
 arlo_GumpackNG_Partitioning_InstallMethodSelection_Exit="Installationsprogramm beenden"
 
@@ -43,29 +43,29 @@ arlo_GumpackNG_Partitioning_Custom="Das System benötigt wenigstens:
 - freiwllig, swap"
 arlo_GumpackNG_Partitioning_Custom_Header="Optionen für benutzerdefinierte Installation:"
 arlo_GumpackNG_Partitioning_Custom_ModifyDisk="1. Festplatte partitionieren"
-arlo_GumpackNG_Partitioning_Custom_SelectPartitions="2. Select partitions to use (boot, swap, root)"
+arlo_GumpackNG_Partitioning_Custom_SelectPartitions="2. Partitionen auswählen (boot, swap, root)"
 
-arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths="Gib die vollständigen Pfaden ein der Boot- und Root-Partition:"
+arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths="Geben Sie die vollständigen Pfaden ein der Boot- und Root-Partition:"
 arlo_GumpackNG_Partitioning_Select_BootPartitionPlaceholder="Boot-Partition (z.B. /dev/sda1, /dev/nvme0n1p1...)"
 arlo_GumpackNG_Partitioning_Select_RootPartitionPlaceholder="Root-Partition (z.B. /dev/sda2, /dev/nvme0n1p2...)"
-arlo_GumpackNG_Partitioning_Select_FormatBootPartition="Boot-Partition formattieren? (Mach dies nicht, falls die schon vor Installation existierte.)"
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Bestätige die Änderungen, da deine Partitionen gelöscht werden."
+arlo_GumpackNG_Partitioning_Select_FormatBootPartition="Boot-Partition formattieren? (Machen Sie dies nicht, es sei denn die Partition war schon vor Installation vorhanden.)"
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Bestätigen Sie die Änderungen, da Ihre Partitionen gelöscht werden."
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Details="Details:"
 # Make sure the next 3 strings have same length, expand with spaces if necessary
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedRootPartition="Ausgewählte Root-Partition   "
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedBootPartition="Ausgewählte Boot-Partition   "
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_FormatBootPartition="EFI formattieren? (Boot-Part)"
 # Make sure \"Confirm\" in GumpackNG_Partitioning_Select_ConfirmWipe_ConfirmText matches GumpackNG_Partitioning_Select_ConfirmWipe_Confirm
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_ConfirmText="Um die Änderungen zu bestätigen und die Partitions zu formattieren, gib \"Confirm\" mit grosses C. Um abzubrechen und andere Änderungen zu machen, gib irgendetwas anders ein."
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_ConfirmText="Um die Änderungen zu bestätigen und die Partitions zu formattieren, geben Sie \"Confirm\" mit grosses C. Um abzubrechen und andere Änderungen zu machen, geben Sie irgendetwas anders ein."
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Confirm="Confirm"
 
 arlo_GumpackNG_Partitioning_Custom_Process_Formatting="Wird formattiert:"
 
 arlo_GumpackNG_InstallConfirm_Header="ArctineOS installieren?"
-arlo_GumpackNG_InstallConfirm_Details="Du bist kurz davor, ArctineOS zu installieren.
+arlo_GumpackNG_InstallConfirm_Details="Bald beginnt die Installation von ArctineOS.
 
-Indem du \"Jetzt installieren\" wählst, wird ArctineOS zur Root-Partition installiert.
-(drück [ESC] um das Installationsprogramm abzubrechen und zu beenden.)"
+Indem Sie \"Jetzt installieren\" wählen, wird ArctineOS zur Root-Partition installiert.
+(drücken Sie [ESC] um das Installationsprogramm abzubrechen und zu beenden.)"
 arlo_GumpackNG_InstallConfirm_Install="Jetzt installieren"
 arlo_GumpackNG_InstallConfirm_Back="Zurück zum Partitionieren"
 arlo_GumpackNG_InstallConfirm_Exiting="Wird beenden..."
