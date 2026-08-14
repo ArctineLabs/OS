@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+arlo_ArCLI_HelpText="ArCLI - ArctineOS CLI Tool
+
+arcli help · display this message
+arcli modules ·
+arcli about · show about"
