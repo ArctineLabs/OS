@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+arlo_ExampleModule_HelpText="Example Module - ArctineOS CLI Tool
+
+example help · display this message
+example about · show about
+
+This module is useless on its own."

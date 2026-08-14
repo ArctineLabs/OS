@@ -1,0 +1,52 @@
+#!/usr/bin/bash
+
+# Load locales.
+# Delete this line if you're intending on only using one language for your module.
+case $LANG in
+    C*)
+        # shellcheck disable=SC1091
+        source ../../../Library/Translations/ArCLI/Executable/en.arctinelocale || limsg s 1 e "Could not find debug locale"
+    ;;
+    *)
+        # shellcheck disable=SC1091
+        source /Arctine/Library/Translations/ArCLI/Executable/en.arctinelocale || limsg s 1 e "Could not find the locale file en.arctinelocale in /Arctine/Library/Translations/ArCLI/Executable/."
+    ;;
+esac
+
+# Project details (must be after loading locales and before anything else)
+arclimod_Name="Example"
+arclimod_Author="Arctine Laboratories"
+arclimod_Version="1.0"
+arclimod_Desc="Example is an example."
+arclimod_ShortDesc="Example is a module template that ArCLI module developers can use to create their own modules."
+arclimod_Year="2026"
+
+# Handle arguments here.
+main() {
+    case "$1" in
+        "-v"|"--version"|"about")
+            about
+        ;;
+        "-h"|"--help"|"help")
+            help
+        ;;
+        *)
+            modulerun "$@" || limsg s 1 e "Failed to run command $*. Does the command exist?"
+        ;;
+    esac
+}
+
+# Show available commands here.
+help() {
+    # shellcheck disable=SC2154
+    echo "$arlo_ExampleModule_HelpText"
+}
+
+# Show info about software
+about() {
+    echo "$arclimod_Name ($arclimod_ShortDesc) $arclimod_Version
+$arclimod_Author $arclimod_Year"
+    echo "$arclimod_Desc"
+}
+
+main "$@"

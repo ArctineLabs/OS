@@ -1,7 +1,10 @@
 #!/usr/bin/bash
 
+# Planning on making ArCLI English-only first, and adding translation support later in the future.
+
 arlo_ArCLI_HelpText="ArCLI - ArctineOS CLI Tool
 
 arcli help · display this message
-arcli modules ·
+arcli modules · manage modules through this command line interface
+arcli modules list · list installed modules
 arcli about · show about"

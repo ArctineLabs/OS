@@ -49,16 +49,16 @@ limsg() {
 }
 
 # Load locales
-case $LANG in
-    C*)
-        # shellcheck disable=SC1091
-        source ../../../Library/Translations/ArCLI/Executable/en.arctinelocale || limsg s 1 e "Could not find debug locale"
-    ;;
-    *)
-        # shellcheck disable=SC1091
-        source /Arctine/Library/Translations/ArCLI/Executable/en.arctinelocale || limsg s 1 e "Could not find the locale file en.arctinelocale in /Arctine/Library/Translations/ArCLI/Executable/."
-    ;;
-esac
+#case $LANG in
+#    C*)
+#        # shellcheck disable=SC1091
+#        source ../../../Library/Translations/ArCLI/Executable/en.arctinelocale || limsg s 1 e "Could not find debug locale"
+#    ;;
+#    *)
+#        # shellcheck disable=SC1091
+#        source /Arctine/Library/Translations/ArCLI/Executable/en.arctinelocale || limsg s 1 e "Could not find the locale file en.arctinelocale in /Arctine/Library/Translations/ArCLI/Executable/."
+#    ;;
+#esac
 
 main() {
     case "$1" in
@@ -68,16 +68,39 @@ main() {
         "-h"|"--help"|"help")
             help
         ;;
+        "permifix"|"--permifix")
+            modules.permifix
+        ;;
         *)
-            modulerun "$@" || limsg s 1 e "Failed to run command $*. Does the command exist?"
+            modulerun "$@" || limsg s 1 e "Failed to run command $*. If you're sure the module exists, try running arcli permifix to repair executable permissions?"
         ;;
     esac
 }
 
+modules.list() {
+    for arcli_module in "$ArCLI_DIR/Modules"/*; do
+        $arcli_module "$@"
+        module_name=${arcli_module##*/}
+        export "$(grep -a -h -m 1 'arclimod_Version=' $ArCLI_DIR/Modules/"$module_name" | head -1)" || limsg s 1 e "Failed to get version for $module_name."
+        echo "$module_name · $arclimod_Version"
+    done
+}
+
+modules.permifix() {
+    limsg s 1 i "Requesting sudo access for making ArCLI modules executable..."
+    sudo chmod +x $ArCLI_DIR/Modules/* || limsg s 1 e "The command failed."
+}
+
 help() {
     # shellcheck disable=SC2154
-    echo "$arlo_ArCLI_HelpText"
-    for arcli_module in "$ArCLI_DIR"/*; do
+    echo "ArCLI - ArctineOS CLI Tool
+
+arcli help|-h|--help · display this message
+arcli modules · manage modules through this command line interface
+arcli modules list · list installed modules
+arcli permifix · Make ArCLI modules executable
+arcli about · show about"
+    for arcli_module in "$ArCLI_DIR/Modules"/*; do
         $arcli_module help
     done
 }
@@ -88,13 +111,13 @@ about() {
 }
 
 modulerun_all() {
-    for arcli_module in "$ArCLI_DIR"/*; do
+    for arcli_module in "$ArCLI_DIR/Modules"/*.arclimod; do
         $arcli_module "$@"
     done
 }
 
 modulerun() {
-    "$ArCLI_DIR/$1" "${@:2}"
+    "$ArCLI_DIR/Modules/$1.arclimod" "${@:2}"
 }
 
 main "$@"

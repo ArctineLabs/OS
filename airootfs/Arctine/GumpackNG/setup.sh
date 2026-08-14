@@ -49,7 +49,7 @@ limsg s 1 i "Populating keyring..."
 pacman-key --init
 pacman-key --populate archlinux
 
-limsg s 1 i "Installing dracut..."
+limsg s 2 i "Installing dracut..."
 pacman -S dracut --noconfirm
 
 git config --global --add safe.directory /OS
@@ -57,29 +57,31 @@ git config --global --add safe.directory /OS
 # shellcheck disable=SC2164
 pushd /OS/arctine-pkg
     chown nobody:nobody -Rv .
-    limsg s 1 i "Installing Milanium dependencies..."
+    limsg s 3 i "Installing Milanium dependencies..."
     source PKGBUILD
     # shellcheck disable=SC2154
     pacman -S "${depends[@]}" --noconfirm
-    limsg s 1 i "Making Milanium..."
+    limsg s 3 i "Making Milanium..."
     sudo -u nobody makepkg -sr
-    limsg s 1 i "Installing Milanium..."
+    limsg s 3 i "Installing Milanium..."
     pacman -Uv ./milanium-*.pkg.tar.zst --noconfirm
+    limsg s 3 i "Activating executable flags for ArCLI modules..."
+    chmod +x /Arctine/Tools/ArCLI/Modules/*
 # shellcheck disable=SC2164
 popd
 
-limsg s 1 i "Syncing clock..."
+limsg s 4 i "Syncing clock..."
 hwclock --systohc
 
-limsg s 1 i "Running filesystem override..."
+limsg s 5 i "Running filesystem override..."
 /Arctine/Scripts/hookhelper filesystem
 
-limsg s 1 i "Enabling NetworkManager..."
+limsg s 6 i "Enabling NetworkManager..."
 systemctl enable NetworkManager
-limsg s 1 i "Enabling GNOME Display Manager..."
+limsg s 6 i "Enabling GNOME Display Manager..."
 systemctl enable gdm
 
-limsg s 1 i "Setting up Snapper snapshots..."
+limsg s 7 i "Setting up Snapper snapshots..."
 umount /.snapshots || true
 rmdir /.snapshots || true
 snapper create-config /
@@ -87,27 +89,27 @@ btrfs subvolume delete /.snapshots
 mkdir /.snapshots
 mount /.snapshots
 
-limsg s 1 i "Removing now obsolete mkinitcpio..."
+limsg s 8 i "Removing now obsolete mkinitcpio..."
 pacman -R mkinitcpio mkinitcpio-archiso --noconfirm
 
-limsg s 1 i "Force generate image kernel..."
+limsg s 8 i "Force generate image kernel..."
 dracut --force
 
 if cat /sys/firmware/efi/fw_platform_size; then
-    limsg s 1 i "Installing GRUB for EFI..."
+    limsg s 9 i "Installing GRUB for EFI..."
     grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 else
     grub-install --target=i386-pc "$(cat /bootpart.txt)"
 fi
 
-limsg s 1 i "Generating GRUB configuration..."
+limsg s 9 i "Generating GRUB configuration..."
 grub-mkconfig -o /boot/grub/grub.cfg
 
 echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel
 chmod 440 /etc/sudoers.d/10-wheel
 visudo -c
 
-limsg s 1 i "Generating locales (this might take a while!)..."
+limsg s 10 i "Generating locales (this might take a while!)..."
 locale-gen
 
 # This will be done by the initial setup in the future.
