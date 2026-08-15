@@ -1,5 +1,9 @@
 #!/usr/bin/bash
 
+if [[ -z ${SnapperConfig:-} ]]; then
+    export SnapperConfig="root"
+fi
+
 # Load locales.
 # Delete this line if you're intending on only using one language for your module.
 # The recommended path for module translation files are usually /Arctine/Library/Translations/ArCLI/Modules/,
@@ -16,11 +20,11 @@
 #esac
 
 # Project details (must be after loading locales and before anything else)
-arclimod_Name="Example"
+arclimod_Name="Snapshot Module for ArCLI"
 arclimod_Author="Arctine Laboratories"
 arclimod_Version=1.0
-arclimod_Desc="Example is a module template that ArCLI module developers can use to create their own modules."
-arclimod_ShortDesc="Example is an example."
+arclimod_Desc="The Snapshot module is an ArCLI wrapper module for Snapper."
+arclimod_ShortDesc="Manage snapshots through ArCLI."
 arclimod_Year="2026"
 
 # Handle arguments here.
@@ -32,6 +36,12 @@ main() {
         "-h"|"--help"|"help")
             help
         ;;
+        "qnew"|"-N"|"--new")
+            snapshot.create "$@"
+        ;;
+        "prepost"|"-Np"|"--pre-post")
+            snapshot.create.prepost "${@:2}"
+        ;;
         *)
             echo "[!] Invalid subcommand $1."
         ;;
@@ -41,12 +51,25 @@ main() {
 # Show available commands here.
 help() {
     # shellcheck disable=SC2154
-    echo "Example Module - ArctineOS CLI Tool
+    echo "Snapshot Module - ArctineOS CLI Tool
 
-example help · display this message
-example about · show about
+snapshot help|-h · display this message
+snapshot about|-v|--version · show about
+snapshot qnew|-N|--new \"<description>\" · make a quick new snapshot (double quote description!!)
+snapshot prepost|-Np|--pre-post <cmd> · automatically create pre and post snapshot while invoking command
 
-This module is useless on its own."
+\$SnapperConfig is set to: $SnapperConfig
+To specify any other config, change the variable's value before running this module"
+}
+
+snapshot.create() {
+    echo "[i] Creating snapshot with arguments \"$*\"..."
+    snapper -c "$SnapperConfig" create --description "$@" || echo "[!] Command failed for some reason."
+}
+
+snapshot.create.prepost() {
+    echo "[i] Automatically creating pre/post snapshots while invoking command ${*}"
+    snapper -c "$SnapperConfig" create --command "${@}" || echo "[!] Command failed for some reason."
 }
 
 # Show info about software

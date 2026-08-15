@@ -1,0 +1,142 @@
+#!/usr/bin/bash
+
+# Load locales.
+# Delete this line if you're intending on only using one language for your module.
+# The recommended path for module translation files are usually /Arctine/Library/Translations/ArCLI/Modules/,
+# but you are free to put it anywhere, as long as the module can access that path.
+#case $LANG in
+#    C*)
+#        # shellcheck disable=SC1091
+#        source ../../../Library/Translations/ArCLI/Modules/Example/en.arctinelocale || echo "[!] Could not find debug locale"
+#    ;;
+#    *)
+#        # shellcheck disable=SC1091
+#        source /Arctine/Library/Translations/ArCLI/Modules/Example/en.arctinelocale || echo "[!] Could not find the locale file en.arctinelocale in /Arctine/Library/Translations/ArCLI/Executable/."
+#    ;;
+#esac
+
+# Project details (must be after loading locales and before anything else)
+arclimod_Name="PM Module"
+arclimod_Author="Arctine Laboratories"
+arclimod_Version=1.0
+arclimod_Desc="The PM Module takes input and automatically detects the package manager to install it with. Supports pacman, Flatpak and ArCLI modules."
+arclimod_ShortDesc="Install packages and modules automatically, upgrade the system."
+arclimod_Year="2026"
+
+# Handle arguments here.
+main() {
+    case "$1" in
+        "-v"|"--version"|"about")
+            about
+        ;;
+        "-h"|"--help"|"help")
+            help
+        ;;
+        +*)
+            pm.add "$@"
+        ;;
+        -*)
+            pm.subtract "$@"
+        ;;
+        *)
+            echo "[!] Invalid subcommand $1."
+        ;;
+    esac
+}
+
+# Show available commands here.
+help() {
+    # shellcheck disable=SC2154
+    echo "PM Module - ArctineOS CLI Tool
+
+pm help · display this message
+pm about · show about
+pm + <pkg> · automatically install package or module (one at a time)
+    -> +A · assume yes on first corresponding package manager
+    -> +y · tell package manager to assume yes without confirmation
+pm - <pkg> · automatically remove package or module (one at a time)
+    -> -A · assume yes on first corresponding package manager
+    -> -y · tell package manager to assume yes without confirmation"
+}
+
+pm.add() {
+    BackendArgs=()
+    Args=$1
+
+    export Args
+    pm.backenddetector "${@:2}"
+}
+
+pm.remove() {
+    BackendArgs=()
+    Args=$1
+
+    export Args
+    pm.backenddetector "${@:2}"
+}
+
+pm.backenddetector() {
+    if [[ -z $Backend ]]; then
+        # If file
+        if [[ -f $2 ]]; then
+            if grep ".pkg.tar.zst$"; then
+                echo "Detected type: Local-pacman"
+                echo "Package: $"
+                if [[ ! $Args == *A* ]]; then
+                    read -rp "Proceed? [Y/n]" confirm
+                    case "$confirm" in
+                        Y|y|yes|Yes|YES)
+                            Backend=localpacman
+                            export Backend
+                        ;;
+                        *)
+                            echo "[i] Continuing guess..."
+                        ;;
+                    esac
+                else
+                    echo "[i] Automatically selected Local-pacman"
+                    Backend=localpacman
+                    export Backend
+                fi
+            else
+                echo "[W] Local-pacman guess incorrect"
+            fi
+
+            if grep ".pkg.tar.zst$"; then
+                echo "Detected type: Local-pacman"
+                echo "Package: $"
+                if [[ ! $Args == *A* ]]; then
+                    read -rp "Proceed? [Y/n]" confirm
+                    case "$confirm" in
+                        Y|y|yes|Yes|YES)
+                            Backend=localpacman
+                            export Backend
+                        ;;
+                        *)
+                            echo "[i] Continuing guess..."
+                        ;;
+                    esac
+                else
+                    echo "[i] Automatically selected Local-pacman"
+                    Backend=localpacman
+                    export Backend
+                fi
+            else
+                echo "[W] Local-pacman guess incorrect"
+            fi
+
+        # If not a file
+        else
+            echo "WIP"
+        fi
+    fi
+}
+
+# Show info about software
+about() {
+    echo "$arclimod_Name ($arclimod_ShortDesc) $arclimod_Version
+$arclimod_Author $arclimod_Year"
+    echo "$arclimod_Desc"
+}
+
+main "$@"

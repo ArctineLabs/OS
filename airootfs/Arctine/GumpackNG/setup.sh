@@ -84,7 +84,7 @@ systemctl enable gdm
 limsg s 7 i "Setting up Snapper snapshots..."
 umount /.snapshots || true
 rmdir /.snapshots || true
-snapper create-config /
+snapper -c root create-config /
 btrfs subvolume delete /.snapshots
 mkdir /.snapshots
 mount /.snapshots
