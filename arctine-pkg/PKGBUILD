@@ -7,6 +7,7 @@ url="https://github.com/ArctineLabs/OS"
 license=('GPL3')
 depends=('junction' 'base' 'gnome-shell' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager' 'dracut' 'pkgfile' 'gum')
 replaces=('betriebssystem')
+provides=('arcli')
 
 package() {
     cp $srcdir/../../airootfs/etc $pkgdir/etc -rv
