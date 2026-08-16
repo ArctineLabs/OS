@@ -229,7 +229,7 @@ pm.backenddetector.question() {
         export Backend
     else
         echo "Detected backend: $GuessBackend"
-        read -rp "Proceed? [Y/n]" confirm
+        read -rp "Proceed? [Y/n] " confirm
         case "$confirm" in
             Y|y|yes|Yes|YES)
                 Backend=$GuessBackend
