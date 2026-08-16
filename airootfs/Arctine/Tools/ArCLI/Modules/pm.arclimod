@@ -113,7 +113,7 @@ pm.sysupdate() {
         sudo gum spin --spinner points --title "Pulling latest commit from OS source..." -- git pull || pm.sysupdate.error "Failed to pull"
         sudo gum spin --spinner points --title "Ensuring \"nobody:nobody\" owns ArctineOS source directory..." -- chown nobody:nobody -Rv . || pm.sysupdate.error "Failed to change ownership to nobody:nobody"
         source PKGBUILD || pm.sysupdate.error "Failed to source PKGBUILD"
-        sudo pacman -Syu || pm.sysupdate.error "Failed to update all packages"
+        sudo pacman -Syu --noconfirm || pm.sysupdate.error "Failed to update all packages"
         # shellcheck disable=SC2154
         sudo pacman -S "${depends[@]}" --noconfirm || pm.sysupdate.error "Failed to install dependencies"
         sudo gum spin --spinner points --title "Building update..." -- sudo -u nobody makepkg -srf || pm.sysupdate.error "Failed to build update package"
