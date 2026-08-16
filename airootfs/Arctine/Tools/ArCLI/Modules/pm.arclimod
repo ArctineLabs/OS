@@ -110,7 +110,7 @@ pm.arclimod() {
                 # shellcheck disable=SC2154
                 sudo cp "$2" "$ArCLI_DIR"/Modules/ -v || (echo "[!] Failed." && exit 1)
             else
-                read -rp "[i] Install ArCLI module $2? [Y/n]" confirm
+                read -rp "[i] Install ArCLI module $2? [Y/n] " confirm
                 case "$confirm" in
                     Y|y|yes|Yes|YES)
                         sudo cp "$2" "$ArCLI_DIR"/Modules/ -v || (echo "[!] Failed." && exit 1)
@@ -126,7 +126,7 @@ pm.arclimod() {
             echo "[i] Checking ownership..."
             if pacman -Qoq "$2"; then
                 ownerPackage=$(pacman -Qoq "$2")
-                read -rp "[?] $ownerPackage via pacman owns module $2. Remove $ownerPackage?" confirm
+                read -rp "[?] $ownerPackage via pacman owns module $2. Remove $ownerPackage? [Y/n] " confirm
                 case "$confirm" in
                     Y|y|yes|Yes|YES)
                         sudo pacman -R "$ownerPackage" || (echo "[!] Failed." && exit 1)
@@ -137,7 +137,7 @@ pm.arclimod() {
                     ;;
                 esac
             else
-                read -rp "[?] Really remove ArCLI module $2?" confirm
+                read -rp "[?] Really remove ArCLI module $2? [Y/n] " confirm
                 case "$confirm" in
                     Y|y|yes|Yes|YES)
                         sudo rm "$ArCLI_DIR"/Modules/"$2" -v || (echo "[!] Failed." && exit 1)
@@ -191,9 +191,23 @@ pm.backenddetector() {
         # If not a file
         if pacman -Ssq "$1" | grep "$1">/dev/null; then
             GuessBackend=pacman 
-            pm.backenddetector.question && return 0
+            if pm.backenddetector.question; then 
+                return 0
+            else
+                read -rp "[W] Attempt installation with Flatpak? [Y/n] " confirm
+                case "$confirm" in
+                    Y|y|yes|Yes|YES)
+                        Backend=flatpak
+                        export Backend
+                    ;;
+                    *)
+                        echo "[!] User denied."
+                        exit 1
+                    ;;
+                esac
+            fi
         else
-            read -rp "[W] pacman guess incorrect. Trying flatpak next, OK? [Y/n]" confirm
+            read -rp "[W] pacman guess incorrect. Trying flatpak next, OK? [Y/n] " confirm
             case "$confirm" in
                 Y|y|yes|Yes|YES)
                     Backend=flatpak
@@ -205,9 +219,6 @@ pm.backenddetector() {
                 ;;
             esac
         fi
-
-        Backend=flatpak
-        export Backend
     fi
 }
 
