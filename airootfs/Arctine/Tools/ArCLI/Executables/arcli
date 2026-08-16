@@ -89,6 +89,9 @@ main() {
                 ;;
             esac
         ;;
+        "")
+            limsg s 1 w "No command specified. Type arcli -h for help."
+        ;;
         *)
             modulerun "$@" || limsg s 1 e "Failed to run command $*. If you're sure the module exists, try running arcli permifix to repair executable permissions?"
         ;;
