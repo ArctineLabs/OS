@@ -108,6 +108,16 @@ pm.remove() {
 }
 
 pm.sysupdate() {
+    read -rp "[i] Perform system update? Save all unsaved work, as this will restart your device. [Y/n] " confirm
+    case "$confirm" in
+        Y|y|yes|Yes|YES)
+            true
+        ;;
+        *)
+            echo "[i] Aborted."
+            exit 1
+        ;;
+    esac
     # shellcheck disable=SC2164
     pushd /OS/arctine-pkg
         gum spin --spinner points --title "Discarding any changes made..." -- git stash || pm.sysupdate.error "Failed to stash commits"
@@ -123,6 +133,8 @@ pm.sysupdate() {
         chmod +x /Arctine/Tools/ArCLI/Modules/* || pm.sysupdate.error "Failed to add executable flag to ArCLI modules"
     # shellcheck disable=SC2164
     popd
+    echo "[i] System update completed successfully. Restarting in 5 seconds..."
+    sleep 5;reboot
 }
 
 pm.sysupdate.error() {
