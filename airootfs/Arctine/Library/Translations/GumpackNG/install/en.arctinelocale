@@ -75,6 +75,7 @@ arlo_GumpackNG_Installation_Process_Packages="Installing packages to target syst
 arlo_GumpackNG_Installation_Process_fstabGeneration="Generating fstab..."
 arlo_GumpackNG_Installation_Process_CopyInstaller="Copying chroot setup to target system..."
 arlo_GumpackNG_Installation_Process_EnterChroot="Entering target system..."
+arlo_GumpackNG_Installation_EnterHostname="Enter your preferred hostname here."
 
 arlo_GumpackNG_Installation_End_Header="Installation finished successfully!"
 arlo_GumpackNG_Installation_End_Reboot="Reboot now"

@@ -65,6 +65,21 @@ pm.add() {
 
     export Args
     pm.backenddetector "${@:2}"
+    pm.argumentassembly
+    case "$Backend" in
+        localpacman)
+            sudo pacman -U "${BackendArgs[@]}" "${@:2}"
+        ;;
+        pacman)
+            sudo pacman -S "${BackendArgs[@]}" "$(pacman -Ssq "$2" | gum filter --select-if-one --limit=1)"
+        ;;
+        flatpak|flatpakfile)
+            flatpak install "${BackendArgs[@]}" "${@:2}"
+        ;;
+        arclimod)
+            pm.arclimod "${@}"
+        ;;
+    esac
 }
 
 pm.remove() {
@@ -73,63 +88,163 @@ pm.remove() {
 
     export Args
     pm.backenddetector "${@:2}"
+    pm.argumentassembly
+    case "$Backend" in
+        localpacman|pacman)
+            sudo pacman -R "${BackendArgs[@]}" "$(pacman -Qsq "$2" | gum filter --select-if-one --limit=1)"
+        ;;
+        flatpak|flatpakfile)
+            flatpak uninstall "${BackendArgs[@]}" "${@:2}"
+        ;;
+        arclimod)
+            pm.arclimod "${@}"
+        ;;
+    esac
+}
+
+pm.arclimod() {
+    case "$Args" in
+        +*)
+            if [[ $Args == *A* ]]; then
+                echo "[i] Installing ArCLI module $2..."
+                # shellcheck disable=SC2154
+                sudo cp "$2" "$ArCLI_DIR"/Modules/ -v || (echo "[!] Failed." && exit 1)
+            else
+                read -rp "[i] Install ArCLI module $2? [Y/n]" confirm
+                case "$confirm" in
+                    Y|y|yes|Yes|YES)
+                        sudo cp "$2" "$ArCLI_DIR"/Modules/ -v || (echo "[!] Failed." && exit 1)
+                    ;;
+                    *)
+                        echo "[i] Aborted."
+                        return 1
+                    ;;
+                esac
+            fi
+        ;;
+        -*)
+            echo "[i] Checking ownership..."
+            if pacman -Qoq "$2"; then
+                ownerPackage=$(pacman -Qoq "$2")
+                read -rp "[?] $ownerPackage via pacman owns module $2. Remove $ownerPackage?" confirm
+                case "$confirm" in
+                    Y|y|yes|Yes|YES)
+                        sudo pacman -R "$ownerPackage" || (echo "[!] Failed." && exit 1)
+                    ;;
+                    *)
+                        echo "[i] Aborted."
+                        return 1
+                    ;;
+                esac
+            else
+                read -rp "[?] Really remove ArCLI module $2?" confirm
+                case "$confirm" in
+                    Y|y|yes|Yes|YES)
+                        sudo rm "$ArCLI_DIR"/Modules/"$2" -v || (echo "[!] Failed." && exit 1)
+                    ;;
+                    *)
+                        echo "[i] Aborted."
+                        return 1
+                    ;;
+                esac
+            fi
+        ;;
+        *)
+            echo "[!] Unrecognised option for pm.arclimod: $1"
+            exit 1
+        ;;
+    esac
 }
 
 pm.backenddetector() {
-    if [[ -z $Backend ]]; then
+    if [[ -z "$*" ]]; then
+        echo "Please specify a package after pm $Args."
+        exit 1
+    elif [[ -z $Backend ]]; then
         # If file
-        if [[ -f $2 ]]; then
-            if grep ".pkg.tar.zst$"; then
-                echo "Detected type: Local-pacman"
-                echo "Package: $"
-                if [[ ! $Args == *A* ]]; then
-                    read -rp "Proceed? [Y/n]" confirm
-                    case "$confirm" in
-                        Y|y|yes|Yes|YES)
-                            Backend=localpacman
-                            export Backend
-                        ;;
-                        *)
-                            echo "[i] Continuing guess..."
-                        ;;
-                    esac
-                else
-                    echo "[i] Automatically selected Local-pacman"
-                    Backend=localpacman
-                    export Backend
-                fi
+        if [[ -f $1 ]]; then
+            # If localpacman
+            if echo "$1" | grep ".pkg.tar.zst$"; then
+                GuessBackend=localpacman 
+                pm.backenddetector.question && return 0
             else
                 echo "[W] Local-pacman guess incorrect"
             fi
 
-            if grep ".pkg.tar.zst$"; then
-                echo "Detected type: Local-pacman"
-                echo "Package: $"
-                if [[ ! $Args == *A* ]]; then
-                    read -rp "Proceed? [Y/n]" confirm
-                    case "$confirm" in
-                        Y|y|yes|Yes|YES)
-                            Backend=localpacman
-                            export Backend
-                        ;;
-                        *)
-                            echo "[i] Continuing guess..."
-                        ;;
-                    esac
-                else
-                    echo "[i] Automatically selected Local-pacman"
-                    Backend=localpacman
-                    export Backend
-                fi
+            # If flatpakref
+            if (echo "$1" | grep ".flatpakref$") || (echo "$1" | grep ".flatpak$"); then
+                GuessBackend=flatpakfile 
+                pm.backenddetector.question && return 0
             else
-                echo "[W] Local-pacman guess incorrect"
+                echo "[W] Flatpak (file) guess incorrect"
             fi
+
+            # If ArCLIModule
+            if echo "$1" | grep ".arclimod$"; then
+                GuessBackend=arclimod 
+                pm.backenddetector.question && return 0
+            else
+                echo "[W] ArCLI Module guess incorrect"
+            fi
+        fi
 
         # If not a file
+        if pacman -Ssq "$1" | grep "$1">/dev/null; then
+            GuessBackend=pacman 
+            pm.backenddetector.question && return 0
         else
-            echo "WIP"
+            read -rp "[W] pacman guess incorrect. Trying flatpak next, OK? [Y/n]" confirm
+            case "$confirm" in
+                Y|y|yes|Yes|YES)
+                    Backend=flatpak
+                    export Backend
+                ;;
+                *)
+                    echo "[!] User denied."
+                    exit 1
+                ;;
+            esac
         fi
+
+        Backend=flatpak
+        export Backend
     fi
+}
+
+pm.backenddetector.question() {
+    if [[ $Args == *A* ]]; then
+        echo "[i] Automatically selected $GuessBackend"
+        Backend=$GuessBackend
+        export Backend
+    else
+        echo "Detected backend: $GuessBackend"
+        read -rp "Proceed? [Y/n]" confirm
+        case "$confirm" in
+            Y|y|yes|Yes|YES)
+                Backend=$GuessBackend
+                export Backend
+                return 0
+            ;;
+            *)
+                echo "[i] Continuing guess..."
+                return 1
+            ;;
+        esac
+    fi
+}
+
+pm.argumentassembly() {
+    case "$Backend" in
+        pacman|localpacman)
+            [[ $Args == *y* ]] && BackendArgs+=(--noconfirm)
+            echo "[i] Assembled pm arguments into $Backend ones: ${BackendArgs[*]}"
+        ;;
+
+        flatpak|flatpakfile)
+            [[ $Args == *y* ]] && BackendArgs+=(--assumeyes)
+            echo "[i] Assembled pm arguments into $Backend ones: ${BackendArgs[*]}"
+        ;;
+    esac
 }
 
 # Show info about software
