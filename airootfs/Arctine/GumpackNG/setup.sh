@@ -2,6 +2,11 @@
 
 # This script is a big mess, I might clean it up later on...
 
+if [ "$EUID" -ne 0 ]
+  then echo -e "Please run the setup with administrative permissions."
+  exit 1
+fi
+
 function scriptcolors() {
     # Reset
     export Color_Off='\033[0m'       # Text Reset
@@ -58,14 +63,17 @@ git config --global --add safe.directory /OS
 pushd /OS/arctine-pkg
     chown nobody:nobody -Rv .
     limsg s 3 i "Installing Milanium dependencies..."
+    # shellcheck disable=SC1091
     source PKGBUILD
     # shellcheck disable=SC2154
     pacman -S "${depends[@]}" --noconfirm
     limsg s 3 i "Making Milanium..."
     sudo -u nobody makepkg -sr
     limsg s 3 i "Installing Milanium..."
-    pacman -Uv ./milanium-*.pkg.tar.zst --noconfirm
+    # shellcheck disable=SC2154
+    pacman -Uv ./"${pkgname}"-"${pkgver}"-"${pkgrel}"-"${arch[*]}".pkg.tar.zst --noconfirm
     limsg s 3 i "Activating executable flags for ArCLI modules..."
+    chmod +x /Arctine/Tools/ArCLI/Executables/arcli
     chmod +x /Arctine/Tools/ArCLI/Modules/*
 # shellcheck disable=SC2164
 popd
@@ -111,6 +119,9 @@ visudo -c
 
 limsg s 10 i "Generating locales (this might take a while!)..."
 locale-gen
+
+limsg s 11 i "Performing symbolic links for ArCLI"
+ln -s /Arctine/Tools/ArCLI/Executables/arcli /usr/bin/arcli
 
 # This will be done by the initial setup in the future.
 
