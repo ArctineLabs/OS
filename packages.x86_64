@@ -103,6 +103,8 @@ networkmanager
 nfs-utils
 nilfs-utils
 nmap
+noto-fonts-cjk
+noto-fonts-extra
 ntfs-3g
 nvme-cli
 open-iscsi
@@ -144,6 +146,9 @@ testdisk
 tmux
 tpm2-tools
 tpm2-tss
+ttf-droid
+ttf-liberation
+ttf-roboto
 udftools
 usb_modeswitch
 usbmuxd

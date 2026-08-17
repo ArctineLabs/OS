@@ -57,6 +57,11 @@ pacman-key --populate archlinux
 limsg s 2 i "Installing dracut..."
 pacman -S dracut --noconfirm
 
+if [[ $1 == "reinstall" ]]; then
+    limsg s 2.5 i "Reinstalling packages because user said to"
+    pacman -Syu --needed --noconfirm "$(cat /mnt/OS/packages.x86_64)"
+fi
+
 git config --global --add safe.directory /OS
 
 # shellcheck disable=SC2164
