@@ -68,7 +68,7 @@ pushd /OS/arctine-pkg
     # shellcheck disable=SC2154
     pacman -S "${depends[@]}" --noconfirm
     limsg s 3 i "Making Milanium..."
-    sudo -u nobody makepkg -sr
+    sudo -u nobody makepkg -srf
     limsg s 3 i "Installing Milanium..."
     # shellcheck disable=SC2154
     pacman -Uv ./"${pkgname}"-"${pkgver}"-"${pkgrel}"-"${arch[*]}".pkg.tar.zst --noconfirm
