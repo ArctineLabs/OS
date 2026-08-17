@@ -87,7 +87,7 @@ pm.add() {
     esac
 }
 
-pm.remove() {
+pm.subtract() {
     BackendArgs=()
     Args=$1
 
