@@ -288,12 +288,12 @@ partitioning.automatic.process() {
 
 partitioning.custom() {
     echo "$arlo_GumpackNG_Partitioning_Custom"
-    Installer_PartitioningCustom_Selection=$(gum choose --header "$arlo_GumpackNG_Partitioning_Custom_Header" --label-delimiter=":" "$arlo_GumpackNG_Partitioning_Custom_ModifyDisk:diskutility"  "$arlo_GumpackNG_Partitioning_Custom_SelectPartitions:select")
+    Installer_PartitioningCustom_Selection=$(gum choose --header "$arlo_GumpackNG_Partitioning_Custom_Header" --label-delimiter=":" "$arlo_GumpackNG_Partitioning_Custom_ModifyDisk"  "$arlo_GumpackNG_Partitioning_Custom_SelectPartitions")
     case "$Installer_PartitioningCustom_Selection" in
-        diskutility)
+        "$arlo_GumpackNG_Partitioning_Custom_ModifyDisk")
             gnome-disks
         ;;
-        select)
+        "$arlo_GumpackNG_Partitioning_Custom_SelectPartitions")
             partitioning.select
         ;;
         *)
