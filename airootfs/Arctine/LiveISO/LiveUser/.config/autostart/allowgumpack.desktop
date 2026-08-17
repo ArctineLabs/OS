@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Allow Install ArctineOS
+Type=Application
+Icon=checkbox-checked-symbolic
+Exec=gio set /Arctine/LiveISO/LiveUser/Desktop/gumpack.desktop metadata::trusted true
+Terminal=false
+Comment=Make ArctineOS Installer desktop app launchable
