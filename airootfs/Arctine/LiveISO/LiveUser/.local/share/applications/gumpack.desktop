@@ -2,7 +2,7 @@
 Name=Install ArctineOS
 Type=Application
 Icon=folder-download-symbolic
-Exec=pkexec bash /Arctine/GumpackNG/install.sh
+Exec=sudo /Arctine/GumpackNG/install.sh
 Terminal=true
 Categories=GNOME;GTK;System;PackageManager;Settings;
 Comment=Install ArctineOS to a system

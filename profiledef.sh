@@ -31,4 +31,10 @@ file_permissions=(
   ["/Arctine/Scripts/hookhelper"]="0:0:755"
   ["/Arctine/GumpackNG/install.sh"]="0:0:755"
   ["/Arctine/LiveISO"]="0:0:755"
+  ["/Arctine/LiveISO/LiveUser"]="1000:1000:0750"
+  ["/Arctine/LiveISO/LiveUser/.local"]="1000:1000:0700"
+  ["/Arctine/LiveISO/LiveUser/.local/share"]="1000:1000:0700"
+  ["/Arctine/LiveISO/LiveUser/.local/share/applications"]="1000:1000:0700"
+  ["/Arctine/LiveISO/LiveUser/.local/share/applications/gumpack.desktop"]="1000:1000:0755"
+  ["/etc/sudoers.d/99-arctine"]="0:0:0440"
 )
