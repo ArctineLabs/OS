@@ -237,7 +237,11 @@ installation() {
     echo "$Installer_PathToBootPartition" >> /mnt/bootpart.txt
     arch-chroot /mnt /setup.sh
     while [[ ! $Installer_HostnameDefined ]]; do
-        gum input --placeholder "$arlo_GumpackNG_Installation_EnterHostname" 
+        if gum input --placeholder "$arlo_GumpackNG_Installation_EnterHostname"; then
+            Installer_HostnameDefined=true
+        else
+            false
+        fi
     done
     ending
 }
