@@ -47,7 +47,7 @@ arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths="Enter full path of the b
 arlo_GumpackNG_Partitioning_Select_BootPartitionPlaceholder="boot partition (e.g. /dev/sda1, /dev/nvme0n1p1...)"
 arlo_GumpackNG_Partitioning_Select_RootPartitionPlaceholder="root partition (e.g. /dev/sda2, /dev/nvme0n1p2...)"
 arlo_GumpackNG_Partitioning_Select_FormatBootPartition="Format boot partition? (Do not do this if it already existed before install)"
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Confirm the changes, as your partitions are going to be wiped."
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Confirm the changes, as your partitions are going to be wiped later on."
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Details="Details:"
 # Make sure the next 3 strings have same length, expand with spaces if necessary
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedRootPartition="Selected root partition"

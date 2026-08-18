@@ -48,7 +48,7 @@ fi
 
 #WIP
 
-case $(gum choose --header "Language:" --label-delimiter=":" "English:en" "Schweizer Hochdeutsch:de_CH" "Bundesdeutsch (DE):de_DE" "Français (Incomplet):fr" "Español/Castellano (Inacabado):es") in #"Debug from source"
+case $(gum choose --header "Language:" --label-delimiter=":" "English:en" "Schweizer Hochdeutsch:de_CH" "Bundesdeutsch (DE):de_DE" "Français:fr") in #"Debug from source"
     "en")
         source /Arctine/Library/Translations/GumpackNG/install/en.arctinelocale
     ;;
@@ -221,6 +221,7 @@ installation() {
     installation_spinner() {
         gum spin --spinner points --title "$@"
     }
+    partitioning.custom.process || bail "Failed to partition"
     installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount "$Installer_PathToRootPartition" /mnt
     installation_spinner "$arlo_GumpackNG_Installation_Process_MountingBootPartition" -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir
     installation_spinner "$arlo_GumpackNG_Installation_Process_CloningSource" -- git clone https://github.com/ArctineLabs/OS /mnt/OS
@@ -329,7 +330,6 @@ partitioning.select() {
         case "$Installer_PartitioningCustom_Selection_Confirm" in
             "$arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Confirm")
                 export Installer_PartitioningCustom_Selection_Done=true
-                partitioning.custom.process
             ;;
             *)
                 false

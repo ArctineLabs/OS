@@ -49,7 +49,7 @@ arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths="Geben Sie die vollständ
 arlo_GumpackNG_Partitioning_Select_BootPartitionPlaceholder="Boot-Partition (z.B. /dev/sda1, /dev/nvme0n1p1...)"
 arlo_GumpackNG_Partitioning_Select_RootPartitionPlaceholder="Root-Partition (z.B. /dev/sda2, /dev/nvme0n1p2...)"
 arlo_GumpackNG_Partitioning_Select_FormatBootPartition="Boot-Partition formattieren? (Machen Sie dies nicht, es sei denn die Partition war schon vor Installation vorhanden.)"
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Bestätigen Sie die Änderungen, da Ihre Partitionen gelöscht werden."
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Bestätigen Sie die Änderungen, da Ihre Partitionen später gelöscht werden."
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Details="Details:"
 # Make sure the next 3 strings have same length, expand with spaces if necessary
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedRootPartition="Ausgewählte Root-Partition   "
