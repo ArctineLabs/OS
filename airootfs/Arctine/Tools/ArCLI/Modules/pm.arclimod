@@ -18,7 +18,7 @@
 # Project details (must be after loading locales and before anything else)
 arclimod_Name="PM Module"
 arclimod_Author="Arctine Laboratories"
-arclimod_Version=1.0
+arclimod_Version=2.0
 arclimod_Desc="The PM Module takes input and automatically detects the package manager to install it with. Supports pacman, Flatpak and ArCLI modules."
 arclimod_ShortDesc="Install packages and modules automatically, upgrade the system."
 arclimod_Year="2026"
@@ -77,7 +77,7 @@ pm.add() {
             sudo pacman -U "${BackendArgs[@]}" "${@:2}"
         ;;
         pacman)
-            sudo pacman -S "${BackendArgs[@]}" "$(pacman -Ssq "$2" | gum filter --select-if-one --limit=1)"
+            sudo pacman -S "${BackendArgs[@]}" "$(pacman -Ssq "$2" | gum filter --no-strict --select-if-one --limit=1)"
         ;;
         flatpak|flatpakfile)
             flatpak install "${BackendArgs[@]}" "${@:2}"
@@ -97,7 +97,7 @@ pm.subtract() {
     pm.argumentassembly
     case "$Backend" in
         localpacman|pacman)
-            sudo pacman -R "${BackendArgs[@]}" "$(pacman -Qsq "$2" | gum filter --select-if-one --limit=1)"
+            sudo pacman -R "${BackendArgs[@]}" "$(pacman -Qsq "$2" | gum filter --no-strict --select-if-one --limit=1)"
         ;;
         flatpak|flatpakfile)
             flatpak uninstall "${BackendArgs[@]}" "${@:2}"
