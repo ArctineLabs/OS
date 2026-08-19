@@ -1,11 +1,11 @@
 pkgname=milanium
 pkgver=26
-pkgrel=5
+pkgrel=6
 pkgdesc="ArctineOS system configuration"
 arch=('any')
 url="https://github.com/ArctineLabs/OS"
 license=('GPL3')
-depends=('junction' 'base' 'gnome-shell' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager' 'dracut' 'pkgfile' 'gum')
+depends=('junction' 'base' 'gnome-shell' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager' 'dracut' 'pkgfile' 'gum' 'zenity')
 replaces=('betriebssystem')
 provides=('arcli')
 
@@ -29,4 +29,13 @@ package() {
     rm -rv $pkgdir/etc/systemd/system/etc-pacman.d-gnupg.mount
     rm -rv $pkgdir/etc/gdm/*
     rm -rv $pkgdir/etc/sudoers.d/*
+
+    chmod +xv $pkgdir/Arctine/Scripts/*
+    chmod +xv $pkgdir/Arctine/Tools/ArCLI/Executables/arcli
+    chmod +xv $pkgdir/Arctine/Tools/Arctualiza/arctualiza
+    chmod +xv $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass
+
+    ln -s $pkgdir/Arctine/Tools/ArCLI/Executables/arcli /usr/bin/arcli
+    ln -s $pkgdir/Arctine/Tools/Arctualiza/arctualiza /usr/bin/arctualiza
+    ln -s $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass /usr/bin/zenityaskpass
 }

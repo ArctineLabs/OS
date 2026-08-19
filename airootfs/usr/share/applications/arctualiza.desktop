@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Update ArctineOS
+Type=Application
+Icon=software-update-available-symbolic
+Exec=/bin/arctualiza
+Categories=GNOME;GTK;System;PackageManager;Settings;
+Comment=Update ArctineOS to the newest version

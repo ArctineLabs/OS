@@ -77,9 +77,9 @@ pushd /OS/arctine-pkg
     limsg s 3 i "Installing Milanium..."
     # shellcheck disable=SC2154
     pacman -Uv ./"${pkgname}"-"${pkgver}"-"${pkgrel}"-"${arch[*]}".pkg.tar.zst --noconfirm
-    limsg s 3 i "Activating executable flags for ArCLI modules..."
-    chmod +x /Arctine/Tools/ArCLI/Executables/arcli
-    chmod +x /Arctine/Tools/ArCLI/Modules/*
+#    limsg s 3 i "Activating executable flags for ArCLI modules..."
+#    chmod +x /Arctine/Tools/ArCLI/Executables/arcli
+#    chmod +x /Arctine/Tools/ArCLI/Modules/*
 # shellcheck disable=SC2164
 popd
 

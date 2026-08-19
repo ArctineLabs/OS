@@ -6,66 +6,67 @@ arlo_GumpackNG_Yes="Oui"
 arlo_GumpackNG_No="Non"
 
 arlo_GumpackNG_checkrequirements_SystemRequirements="Conditions d'installation"
-arlo_GumpackNG_checkrequirements_BootedMode="Mode démarré"
+arlo_GumpackNG_checkrequirements_BootedMode="Mode de démarrage"
 arlo_GumpackNG_checkrequirements_RAM="Mémoire vive"
-arlo_GumpackNG_checkrequirements_Network="Connexion internet (sera configurée plus tard)"
+arlo_GumpackNG_checkrequirements_Network="Connexion Internet (sera configurée plus tard)"
 arlo_GumpackNG_checkrequirements_GB="Go"
-arlo_GumpackNG_checkrequirements_20GBFreeStorage="20Go d'espace libre"
-arlo_GumpackNG_checkrequirements_Judgement_Boot_Good="PASS: Le système a été démarré en mode UEFI. L'installation peut continuer."
-arlo_GumpackNG_checkrequirements_Judgement_Boot_Bad="FAIL: Le système a été démarré en mode BIOS. Pour le moment, l'installateur ne supporte pas l'installation d'ArctineOS sur les systèmes BIOS."
-arlo_GumpackNG_checkrequirements_Judgement_Memory_Good="PASS: La mémoire vive installée surpasse la capacité recommandée."
+arlo_GumpackNG_checkrequirements_20GBFreeStorage="20 Go d'espace libre"
+arlo_GumpackNG_checkrequirements_Judgement_Boot_Good="PASS: Le système a démarré en mode UEFI. L'installation peut continuer."
+arlo_GumpackNG_checkrequirements_Judgement_Boot_Bad="FAIL: Le système a démarré en mode BIOS. Pour le moment, l'installateur ne supporte pas l'installation d'ArctineOS sur les systèmes BIOS."
+arlo_GumpackNG_checkrequirements_Judgement_Memory_Good="PASS: La quantité de mémoire vive installée dépasse la quantité recommandée."
 arlo_GumpackNG_checkrequirements_Judgement_Memory_Ok() {
-    echo "WARN: La capacité de mémoire vive est 8 Go. $InstallerRequirements_Memory est également supporté, mais la performance pourrait souffrir."
+    echo "WARN: La quantité de mémoire vive recommandée est de 8 Go. Une quantité de $InstallerRequirements_Memory Go est également prise en charge, mais les performances pourraient être réduites."
 }
 arlo_GumpackNG_checkrequirements_Judgement_Memory_Bad="FAIL: La capacité de mémoire vive n'est ni égale ni supérieure à la capacité minimum (4 Go), et l'installation ne peut pas continuer."
-arlo_GumpackNG_checkrequirements_Accept="Accepter les informations et continuer l'installation?"
-arlo_GumpackNG_checkrequirements_Fail="Votre système ne conforme pas aux conditions d'installation, et l'installateur ne peut pas continuer."
-arlo_GumpackNG_checkrequirements_Fail_EnterToExit="Appuyez la touche [ENTRÉE] pour quitter l'installateur."
+arlo_GumpackNG_checkrequirements_Accept="Accepter les informations et continuer l'installation ?"
+arlo_GumpackNG_checkrequirements_Fail="Votre système ne satisfait pas aux conditions d'installation, et l'installateur ne peut pas continuer."
+arlo_GumpackNG_checkrequirements_Fail_EnterToExit="Appuyez sur la touche [ENTRÉE] pour quitter l'installateur."
 
-arlo_GumpackNG_Welcome_Header="Bienvenue à l'installation d'ArctineOS."
+arlo_GumpackNG_Welcome_Header="Bienvenue dans l'installation d'ArctineOS."
 arlo_GumpackNG_Welcome_Continue="Continuer"
 arlo_GumpackNG_Welcome_Exit="Quitter"
 
-arlo_GumpackNG_Network_Test_Loading="Test de connexion au serveur:"
-arlo_GumpackNG_Network_Test_Fail="La connection au serveur n'a pas pu être établie:"
-arlo_GumpackNG_Network_Fix_Header="L'appareil n'a pas pu se connecter à l'un des deux serveurs. Sélectionnez une option:"
+arlo_GumpackNG_Network_Test_Loading="Test de connexion au serveur :"
+arlo_GumpackNG_Network_Test_Fail="La connexion au serveur n'a pas pu être établie :"
+arlo_GumpackNG_Network_Fix_Header="La connexion à l'un des deux serveurs a échoué. Sélectionnez une option :"
 arlo_GumpackNG_Network_Fix_Retry="Réessayer"
 arlo_GumpackNG_Network_Fix_Settings="Ouvrir les paramètres réseau"
-arlo_GumpackNG_Network_Fix_NoOption="Aucune option n'a été sélectionnée, nouvelle tentation..."
+arlo_GumpackNG_Network_Fix_NoOption="Aucune option n'a été sélectionnée, nouvelle tentative..."
 
-arlo_GumpackNG_Partitioning_InstallMethodSelection="Comment souhaitez-vous installer ArctineOS?"
+arlo_GumpackNG_Partitioning_InstallMethodSelection="Comment souhaitez-vous installer ArctineOS ?"
 arlo_GumpackNG_Partitioning_InstallMethodSelection_Custom="Partitionner le disque et installer ArctineOS"
 arlo_GumpackNG_Partitioning_InstallMethodSelection_Exit="Quitter l'installateur"
 
-arlo_GumpackNG_Partitioning_Custom="Le système a besoin d'au moins:
+arlo_GumpackNG_Partitioning_Custom="Le système a besoin d'au moins :
 - une partition de démarrage (doit être FAT32)
 - une partition root (doit être btrfs) (où le système sera installé)
-- optionnellement, swap"
-arlo_GumpackNG_Partitioning_Custom_Header="Options d'installation personalisée:"
+- éventuellement, une partition swap"
+arlo_GumpackNG_Partitioning_Custom_Header="Options d'installation personnalisée :"
 arlo_GumpackNG_Partitioning_Custom_ModifyDisk="1. Modifier le disque"
 arlo_GumpackNG_Partitioning_Custom_SelectPartitions="2. Sélectionner les partitions pour l'installation (démarrage, swap, root)"
 
-arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths="Entrez le chemin entier des partitions boot et root:"
+arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths="Entrez le chemin complet des partitions boot et root :"
 arlo_GumpackNG_Partitioning_Select_BootPartitionPlaceholder="partition démarrage (p.ex. /dev/sda1, /dev/nvme0n1p1...)"
 arlo_GumpackNG_Partitioning_Select_RootPartitionPlaceholder="partition root (p.ex. /dev/sda2, /dev/nvme0n1p2...)"
 arlo_GumpackNG_Partitioning_Select_FormatBootPartition="Formater la partition de démarrage? (Ne faites pas ça si elle existait déjà avant l'installation)"
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Confirmez les sélections, car les partitions seront effacées."
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Header="Confirmez vos sélections, car les partitions seront effacées."
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Details="Détails:"
 # Make sure the next 3 strings have same length, expand with spaces if necessary
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedRootPartition="Partition root sélectionnée          "
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedBootPartition="Partition démarrage sélectionnée     "
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_FormatBootPartition="Formater l'EFI? (partition démarrage)"
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedRootPartition="Partition root sélectionnée             "
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_SelectedBootPartition="Partition de démarrage sélectionnée     "
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_FormatBootPartition="Formater l'EFI ? (partition démarrage)  "
 # Make sure \"Confirm\" in GumpackNG_Partitioning_Select_ConfirmWipe_ConfirmText matches GumpackNG_Partitioning_Select_ConfirmWipe_Confirm
-arlo_GumpackNG_Partitioning_Select_ConfirmWipe_ConfirmText="Pour confirmer la sélection et effectuer des changements sur les partitions, écrivez \"Confirmer\" avec C majuscule. To cancel and make any other changes, type anything else."
+arlo_GumpackNG_Partitioning_Select_ConfirmWipe_ConfirmText="Pour confirmer la sélection et effectuer des modifications sur les partitions, écrivez « Confirmer » avec un C majuscule. Pour annuler ou effectuer d'autres modifications, saisissez n'importe quoi d'autre."
 arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Confirm="Confirmer"
 
-arlo_GumpackNG_Partitioning_Custom_Process_Formatting="Formatage de la partition:"
+arlo_GumpackNG_Partitioning_Custom_Process_Formatting="Formatage de la partition :"
 
-arlo_GumpackNG_InstallConfirm_Header="Installer ArctineOS?"
-arlo_GumpackNG_InstallConfirm_Details="Vous êtes sur le point de commencer le processus d'installation.
+arlo_GumpackNG_InstallConfirm_Header="Installer ArctineOS ?"
+arlo_GumpackNG_InstallConfirm_Details="Vous êtes sur le point de commencer l'installation.
 
-Si vous choisissez \"Installer maintenant\", la partition de root sera effacée, et si choisi, la partition EFI sera également effacée.
-(pressing [ÉCHAP] will exit the installer and cancel the installation process.)"
+Si vous choisissez « Installer maintenant », la partition root sera effacée et,
+si cette option a été sélectionnée, la partition EFI sera également effacée.
+(Appuyez sur [ÉCHAP] pour quitter l'installateur et annuler le processus d'installation.)"
 arlo_GumpackNG_InstallConfirm_Install="Installer maintenant"
 arlo_GumpackNG_InstallConfirm_Back="Retourner aux partitions"
 arlo_GumpackNG_InstallConfirm_Exiting="Fermeture de l'installateur..."
@@ -73,17 +74,17 @@ arlo_GumpackNG_InstallConfirm_Exiting="Fermeture de l'installateur..."
 arlo_GumpackNG_Installation_Process_MountingRootPartition="Montage de la partition root..."
 arlo_GumpackNG_Installation_Process_MountingBootPartition="Montage de la partition de démarrage..."
 arlo_GumpackNG_Installation_Process_CloningSource="Clonage du code source d'ArctineOS..."
-arlo_GumpackNG_Installation_Process_Packages="Installation des paquets sur la nouvelle installation..."
+arlo_GumpackNG_Installation_Process_Packages="Installation des paquets sur le nouveau système..."
 arlo_GumpackNG_Installation_Process_fstabGeneration="Génération du fstab..."
-arlo_GumpackNG_Installation_Process_CopyInstaller="Copie de la configuration chroot vers la nouvelle installation..."
-arlo_GumpackNG_Installation_Process_EnterChroot="Entrée dans la nouvelle installation..."
-arlo_GumpackNG_Installation_EnterHostname="Entrez l'hostname préféré."
+arlo_GumpackNG_Installation_Process_CopyInstaller="Copie de la configuration chroot vers le nouveau système..."
+arlo_GumpackNG_Installation_Process_EnterChroot="Entrée dans le nouvel environnement..."
+arlo_GumpackNG_Installation_EnterHostname="Entrez le nom d'hôte souhaité."
 
 arlo_GumpackNG_Installation_End_Header="L'installation s'est terminée avec succès !"
 arlo_GumpackNG_Installation_End_Reboot="Redémarrer"
 arlo_GumpackNG_Installation_End_ExitInstaller="Quitter l'installateur"
 
-arlo_GumpackNG_bail="ERROR: L'installateur a échouée avec le message suivant:"
+arlo_GumpackNG_bail="ERREUR: L'installateur a échoué avec le message suivant :"
 arlo_GumpackNG_bail_ENTER="[ENTRÉE]"
 arlo_GumpackNG_bail_Error_BootPart="Échec du formatage de la partition de démarrage..."
 arlo_GumpackNG_bail_Error_RootPart="Échec du formatage de la partition root..."
