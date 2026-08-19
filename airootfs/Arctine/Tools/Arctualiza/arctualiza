@@ -43,7 +43,7 @@ upgrade() {
     (
         echo "11"
         echo "# Discarding any changes made in the source code directory..."
-        git stash || error "Failed to stash commits"
+        git stash
         echo "22"
         echo "# Pulling latest commits from OS source..."
         git pull || error "Failed to pull"
