@@ -1,6 +1,6 @@
 pkgname=milanium
 pkgver=26
-pkgrel=7
+pkgrel=8
 pkgdesc="ArctineOS system configuration"
 arch=('any')
 url="https://github.com/ArctineLabs/OS"
@@ -34,6 +34,8 @@ package() {
     chmod +x -v $pkgdir/Arctine/Tools/ArCLI/Executables/arcli
     chmod +x -v $pkgdir/Arctine/Tools/Arctualiza/arctualiza
     chmod +x -v $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass
+
+    chmod +x -v $pkgdir/usr/bin/update-grub
 
     mkdir -pv $pkgdir/usr/bin/
 
