@@ -35,6 +35,8 @@ package() {
     chmod +x -v $pkgdir/Arctine/Tools/Arctualiza/arctualiza
     chmod +x -v $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass
 
+    mkdir -pv $pkgdir/usr/bin/
+
     ln -sf $pkgdir/Arctine/Tools/ArCLI/Executables/arcli $pkgdir/usr/bin/arcli
     ln -s $pkgdir/Arctine/Tools/Arctualiza/arctualiza $pkgdir/usr/bin/arctualiza
     ln -s $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass $pkgdir/usr/bin/zenityaskpass
