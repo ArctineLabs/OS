@@ -5,7 +5,8 @@
 main() {
     if gui; then
         FUNC=$(declare -f upgrade)
-        sudo bash -c "$FUNC; upgrade"
+        FUNC2=$(declare -f error)
+        sudo bash -c "$FUNC; $FUNC2; upgrade"
     else
         if [[ $GUI_OPTION == "View commit history" ]]; then
             xdg-open https://github.com/ArctineLabs/OS/commits/main/

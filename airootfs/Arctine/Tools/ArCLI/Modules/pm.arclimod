@@ -40,7 +40,8 @@ main() {
         ;;
         sysupdate)
             FUNC=$(declare -f pm.sysupdate)
-            sudo bash -c "$FUNC; pm.sysupdate"
+            FUNC2=$(declare -f pm.sysupdate.error)
+            sudo bash -c "$FUNC; $FUNC2; pm.sysupdate"
         ;;
         *)
             echo "[!] Invalid subcommand $1."
