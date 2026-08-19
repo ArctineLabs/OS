@@ -1,6 +1,6 @@
 pkgname=milanium
 pkgver=26
-pkgrel=6
+pkgrel=7
 pkgdesc="ArctineOS system configuration"
 arch=('any')
 url="https://github.com/ArctineLabs/OS"
