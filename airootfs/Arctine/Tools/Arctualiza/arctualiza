@@ -18,7 +18,7 @@ main() {
 
 gui() {
     GUI_OPTION=$(zenity --question --title="Update ArctineOS" \
-        --text="wawa" \
+        --text="$(pacman -Qiq milanium | head -n 2)" \
         --ok-label "Update system" \
         --cancel-label "Exit updater" \
         --extra-button "View commit history" \
@@ -30,7 +30,7 @@ gui() {
     else
         true
     fi
-#        --text="$(pacman -Qiq milanium | head -n 2)" \
+#        --text="wawa" \
 }
 
 upgrade() {
