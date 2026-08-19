@@ -30,10 +30,10 @@ package() {
     rm -rv $pkgdir/etc/gdm/*
     rm -rv $pkgdir/etc/sudoers.d/*
 
-    chmod +xv $pkgdir/Arctine/Scripts/*
-    chmod +xv $pkgdir/Arctine/Tools/ArCLI/Executables/arcli
-    chmod +xv $pkgdir/Arctine/Tools/Arctualiza/arctualiza
-    chmod +xv $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass
+    chmod +x -v $pkgdir/Arctine/Scripts/*
+    chmod +x -v $pkgdir/Arctine/Tools/ArCLI/Executables/arcli
+    chmod +x -v $pkgdir/Arctine/Tools/Arctualiza/arctualiza
+    chmod +x -v $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass
 
     ln -s $pkgdir/Arctine/Tools/ArCLI/Executables/arcli /usr/bin/arcli
     ln -s $pkgdir/Arctine/Tools/Arctualiza/arctualiza /usr/bin/arctualiza
