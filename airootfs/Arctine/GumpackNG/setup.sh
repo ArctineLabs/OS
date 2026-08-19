@@ -125,8 +125,8 @@ visudo -c
 limsg s 10 i "Generating locales (this might take a while!)..."
 locale-gen
 
-limsg s 11 i "Performing symbolic links for ArCLI"
-ln -s /Arctine/Tools/ArCLI/Executables/arcli /usr/bin/arcli
+# limsg s 11 i "Performing symbolic links for ArCLI"
+# ln -s /Arctine/Tools/ArCLI/Executables/arcli /usr/bin/arcli
 
 # This will be done by the initial setup in the future.
 
