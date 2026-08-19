@@ -77,7 +77,7 @@ pm.add() {
             sudo pacman -U "${BackendArgs[@]}" "${@:2}"
         ;;
         pacman)
-            sudo pacman -S "${BackendArgs[@]}" "$(pacman -Ssq "$2" | gum filter --no-strict --select-if-one --limit=1)"
+            sudo pacman -S "${BackendArgs[@]}" "$(pacman -Ssq "$2" | gum filter --no-strict --select-if-one)"
         ;;
         flatpak|flatpakfile)
             flatpak install "${BackendArgs[@]}" "${@:2}"
@@ -97,7 +97,7 @@ pm.subtract() {
     pm.argumentassembly
     case "$Backend" in
         localpacman|pacman)
-            sudo pacman -R "${BackendArgs[@]}" "$(pacman -Qsq "$2" | gum filter --no-strict --select-if-one --limit=1)"
+            sudo pacman -R "${BackendArgs[@]}" "$(pacman -Qsq "$2" | gum filter --no-strict --select-if-one)"
         ;;
         flatpak|flatpakfile)
             flatpak uninstall "${BackendArgs[@]}" "${@:2}"
