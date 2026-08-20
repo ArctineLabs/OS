@@ -77,10 +77,13 @@ pm.add() {
             sudo pacman -U "${BackendArgs[@]}" "${@:2}"
         ;;
         pacman)
-            sudo pacman -S "${BackendArgs[@]}" "$(pacman -Ssq "$2" | gum filter --no-limit --select-if-one | xargs)"
+            # shellcheck disable=SC2046
+            # shellcheck disable=SC2068
+            sudo pacman -S ${BackendArgs[@]} $(pacman -Ssq "$2" | gum filter --no-limit --select-if-one | xargs)
         ;;
         flatpak|flatpakfile)
-            flatpak install "${BackendArgs[@]}" "${@:2}"
+            # shellcheck disable=SC2068
+            flatpak install ${BackendArgs[@]} ${@:2}
         ;;
         arclimod)
             pm.arclimod "${@}"
@@ -97,10 +100,13 @@ pm.subtract() {
     pm.argumentassembly
     case "$Backend" in
         localpacman|pacman)
-            sudo pacman -R "${BackendArgs[@]}" "$(pacman -Qsq "$2" | gum filter --no-limit --select-if-one | xargs)"
+            # shellcheck disable=SC2046
+            # shellcheck disable=SC2068
+            sudo pacman -R ${BackendArgs[@]} $(pacman -Qsq "$2" | gum filter --no-limit --select-if-one | xargs)
         ;;
         flatpak|flatpakfile)
-            flatpak uninstall "${BackendArgs[@]}" "${@:2}"
+            # shellcheck disable=SC2068
+            flatpak uninstall ${BackendArgs[@]} ${@:2}
         ;;
         arclimod)
             pm.arclimod "${@}"
