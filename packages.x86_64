@@ -157,6 +157,7 @@ usbutils
 vim
 virtualbox-guest-utils-nox
 vpnc
+wget
 wireless_tools
 wireless-regdb
 wpa_supplicant
