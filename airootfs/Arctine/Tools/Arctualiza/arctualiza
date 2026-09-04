@@ -79,8 +79,7 @@ upgrade() {
   --title="Updating system..." \
   --text="Preparation..." \
   --percentage=0 \
-  --no-cancel \
-  --time-remaining
+  --no-cancel
 }
 
 error() {
