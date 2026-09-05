@@ -1,0 +1,5 @@
+[org/gnome/shell/extensions/arcmenu]
+menu-layout='windows'
+pinned-apps=[{'id': 'firefox.desktop'}, {'id': 'org.gnome.Nautilus.desktop'}]
+pop-folders-data={'Library Home': 'Library Home', 'System': 'System', 'Utilities': 'Utilities'}
+prefs-visible-page=0
