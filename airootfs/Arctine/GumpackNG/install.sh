@@ -168,7 +168,7 @@ modules() {
 # Modules
 
 network() {
-    while [[ $Installer_NetworkConnected == false ]]; do
+    while [[ $Installer_NetworkConnected == "false" ]]; do
         network.test || network.fix
         if [[ $Installer_NetworkConnected_Ping == 2 ]]; then
             export Installer_NetworkConnected=true
@@ -223,6 +223,12 @@ installation() {
     }
     partitioning.custom.process || bail "Failed to partition"
     installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount "$Installer_PathToRootPartition" /mnt
+    installation_spinner "+ @ subvolume..." -- btrfs subvolume create /mnt/@
+    installation_spinner "+ @home subvolume..." -- btrfs subvolume create /mnt/@home
+    installation_spinner "umount /mnt" -- umount /mnt
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@ "$Installer_PathToRootPartition" /mnt
+    mkdir -p /mnt/home
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@home "$Installer_PathToRootPartition" /mnt
     installation_spinner "$arlo_GumpackNG_Installation_Process_MountingBootPartition" -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir
     installation_spinner "$arlo_GumpackNG_Installation_Process_CloningSource" -- git clone https://github.com/ArctineLabs/OS /mnt/OS
     # shellcheck disable=SC2046
@@ -330,6 +336,7 @@ partitioning.select() {
         case "$Installer_PartitioningCustom_Selection_Confirm" in
             "$arlo_GumpackNG_Partitioning_Select_ConfirmWipe_Confirm")
                 export Installer_PartitioningCustom_Selection_Done=true
+                export Installer_PartitioningDone=true
             ;;
             *)
                 false
@@ -347,8 +354,6 @@ partitioning.custom.process() {
     if [[ $Installer_FormatEFI ]]; then
         gum spin --spinner points --title "$arlo_GumpackNG_Partitioning_Custom_Process_Formatting $Installer_PathToBootPartition..." --show-error -- mkfs.fat -F 32 "$Installer_PathToBootPartition" || bail "$arlo_GumpackNG_bail_Error_BootPart"
     fi
-    export Installer_PartitioningCustom_Selection_Done=true
-    export Installer_PartitioningDone=true
 }
 
 # Disregard
