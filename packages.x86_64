@@ -70,6 +70,8 @@ libfido2
 libusb-compat
 linux
 linux-headers
+linux-lts
+linux-lts-headers
 linux-zen
 linux-zen-headers
 linux-atm
