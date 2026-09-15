@@ -327,8 +327,8 @@ partitioning.select() {
     while ! $Installer_PartitioningCustom_Selection_Done; do
         echo $arlo_GumpackNG_Partitioning_Select_EnterPartitionPaths
         lsblk -pno "NAME,SIZE,TYPE,FSTYPE" | grep "part"
-        Installer_PathToBootPartition=$(gum input --placeholder "$arlo_GumpackNG_Partitioning_Select_BootPartitionPlaceholder")
-        Installer_PathToRootPartition=$(gum input --placeholder "$arlo_GumpackNG_Partitioning_Select_RootPartitionPlaceholder")
+        Installer_PathToBootPartition=$(lsblk -pnlo "NAME" --filter "TYPE == 'part'" | gum choose --header "$arlo_GumpackNG_Partitioning_Select_BootPartitionPlaceholder")
+        Installer_PathToRootPartition=$(lsblk -pnlo "NAME" --filter "TYPE == 'part'" | gum choose --header "$arlo_GumpackNG_Partitioning_Select_RootPartitionPlaceholder")
         if gum confirm "$arlo_GumpackNG_Partitioning_Select_FormatBootPartition";then
             export Installer_FormatEFI=true
         else
