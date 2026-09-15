@@ -222,27 +222,27 @@ installation() {
         gum spin --spinner points --title "$@"
     }
     partitioning.custom.process || bail "Failed to partition"
-    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount "$Installer_PathToRootPartition" /mnt
-    installation_spinner "+ @ subvolume..." -- btrfs subvolume create /mnt/@
-    installation_spinner "+ @home subvolume..." -- btrfs subvolume create /mnt/@home
-    installation_spinner "umount /mnt" -- umount /mnt
-    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@ "$Installer_PathToRootPartition" /mnt
-    mkdir -p /mnt/home
-    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@home "$Installer_PathToRootPartition" /mnt
-    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingBootPartition" -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir
-    installation_spinner "$arlo_GumpackNG_Installation_Process_CloningSource" -- git clone https://github.com/ArctineLabs/OS /mnt/OS
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount "$Installer_PathToRootPartition" /mnt || bail "Error in installation"
+    installation_spinner "+ @ subvolume..." -- btrfs subvolume create /mnt/@ || bail "Error in installation"
+    installation_spinner "+ @home subvolume..." -- btrfs subvolume create /mnt/@home || bail "Error in installation"
+    installation_spinner "umount /mnt" -- umount /mnt || bail "Error in installation"
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@ "$Installer_PathToRootPartition" /mnt || bail "Error in installation"
+    mkdir -p /mnt/home || bail "Error in installation"
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@home "$Installer_PathToRootPartition" /mnt || bail "Error in installation"
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingBootPartition" -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir || bail "Error in installation"
+    installation_spinner "$arlo_GumpackNG_Installation_Process_CloningSource" -- git clone https://github.com/ArctineLabs/OS /mnt/OS || bail "Error in installation"
     # shellcheck disable=SC2046
     echo "$arlo_GumpackNG_Installation_Process_Packages"; sleep 0.5
     # shellcheck disable=SC2046
-    pacstrap -K /mnt $(cat /mnt/OS/packages.x86_64)
-    installation_spinner "$arlo_GumpackNG_Installation_Process_fstabGeneration" --show-output -- genfstab -U /mnt >> /mnt/etc/fstab
-    cp /Arctine/GumpackNG/setup.sh /mnt/setup.sh -v;chmod +x /mnt/setup.sh
+    pacstrap -K /mnt $(cat /mnt/OS/packages.x86_64) || bail "Error in installation"
+    installation_spinner "$arlo_GumpackNG_Installation_Process_fstabGeneration" --show-output -- genfstab -U /mnt >> /mnt/etc/fstab || bail "Error in installation"
+    cp /Arctine/GumpackNG/setup.sh /mnt/setup.sh -v;chmod +x /mnt/setup.sh || bail "Error in installation"
 #   installation_spinner "Creating subvolume for snapshots..." -- btrfs subvolume create /mnt/.snapshots
 #   installation_spinner "Creating Snapper config for snapshots..." -- snapper --root=/mnt create-config /
     echo "$arlo_GumpackNG_Installation_Process_CopyInstaller"
     echo "$arlo_GumpackNG_Installation_Process_EnterChroot"
-    echo "$Installer_PathToBootPartition" >> /mnt/bootpart.txt
-    arch-chroot /mnt /setup.sh
+    echo "$Installer_PathToBootPartition" >> /mnt/bootpart.txt || bail "Error in installation"
+    arch-chroot /mnt /setup.sh || bail "Error in chroot"
     while [[ ! $Installer_HostnameDefined ]]; do
         if gum input --placeholder "$arlo_GumpackNG_Installation_EnterHostname"; then
             Installer_HostnameDefined=true
@@ -270,8 +270,17 @@ ending() {
 network.test() {
     export Installer_NetworkConnected_Ping=0
     # gum spin --spinner points --title "Testing connection to Google..." -- ping google.com -c 1 || echo "Could not establish a connection to Google."
-    gum spin --spinner points --title "$arlo_GumpackNG_Network_Test_Loading GitHub..." -- ping github.com -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1)) || echo "$arlo_GumpackNG_Network_Test_Fail GitHub."
-    gum spin --spinner points --title "$arlo_GumpackNG_Network_Test_Loading gnu.org..." -- ping gnu.org -c 1 && export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))  ||  echo "$arlo_GumpackNG_Network_Test_Fail gnu.org."
+    if gum spin --spinner points --title "$arlo_GumpackNG_Network_Test_Loading GitHub..." -- ping github.com -c 1; then
+        export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))
+    else
+        echo "$arlo_GumpackNG_Network_Test_Fail GitHub."
+    fi
+
+    if gum spin --spinner points --title "$arlo_GumpackNG_Network_Test_Loading gnu.org..." -- ping gnu.org -c 1; then
+        export Installer_NetworkConnected_Ping=$((Installer_NetworkConnected_Ping + 1))
+    else
+        echo "$arlo_GumpackNG_Network_Test_Fail gnu.org."
+    fi
 }
 
 network.fix() {

@@ -8,6 +8,7 @@ bcachefs-tools
 bind
 bolt
 brltty
+broadcom-wl-dkms
 btrfs-progs
 clonezilla
 cloud-init
