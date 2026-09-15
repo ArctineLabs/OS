@@ -228,7 +228,7 @@ installation() {
     installation_spinner "umount /mnt" -- umount /mnt || bail "Error in installation"
     installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@ "$Installer_PathToRootPartition" /mnt || bail "Error in installation"
     mkdir -p /mnt/home || bail "Error in installation"
-    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@home "$Installer_PathToRootPartition" /mnt || bail "Error in installation"
+    installation_spinner "$arlo_GumpackNG_Installation_Process_MountingRootPartition" -- mount -o noatime,compress=zstd,space_cache=v2,subvol=@home "$Installer_PathToRootPartition" /mnt/home || bail "Error in installation"
     installation_spinner "$arlo_GumpackNG_Installation_Process_MountingBootPartition" -- mount "$Installer_PathToBootPartition" /mnt/boot --mkdir || bail "Error in installation"
     installation_spinner "$arlo_GumpackNG_Installation_Process_CloningSource" -- git clone https://github.com/ArctineLabs/OS /mnt/OS || bail "Error in installation"
     # shellcheck disable=SC2046
