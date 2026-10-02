@@ -4,3 +4,8 @@ Ignore
 plus
 arctine-pkg/pkg
 arctine-pkg/*.zst
+*.img
+cosign.key
+_build_*
+output
+_build-*/**

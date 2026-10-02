@@ -16,15 +16,26 @@ sudo ./mkarctine clean
 sudo ./mkarctine clean-out
 ```
 
-# Acknowledgements
-GNOME Extensions (found under airootfs/usr/share/gnome-shell/extensions/):
+# Acknowledgements/Licensing
+ArctineOS itself is licensed under the GPLv3-or-later, the license is found at the root of the repository in a file named `LICENSE`
 
-- [blur-my-shell@aunetx](https://extensions.gnome.org/extension/3193/blur-my-shell/)
-- [copyous@boerdereinar.dev](https://extensions.gnome.org/extension/8834/copyous/)
-- [gsconnect@andyholmes.github.io](https://extensions.gnome.org/extension/1319/gsconnect/)
-- [tilingshell@ferrarodomenico.com](https://extensions.gnome.org/extension/7065/tiling-shell/)
+### Derived code
+The following files contain code derived from [bootcrew/mono](https://github.com/bootcrew/mono) (Copyright 2025 tulilirockz, Apache License 2.0):
+- `Justfile`
+- `bcvk.just`
+- `scripts/bootc-rootfs.sh`
+- `scripts/build.sh`
+- `scripts/initramfs.sh`
 
-The rest of the projects should have their licenses in the final filesystem.
+### GNOME Extensions (3rd-party)
+(found under airootfs/usr/share/gnome-shell/extensions/)
+
+- [blur-my-shell@aunetx](https://extensions.gnome.org/extension/3193/blur-my-shell/) [(GPLv3 LICENSE)](https://github.com/ArctineLabs/OS/blob/main/airootfs/usr/share/gnome-shell/extensions/blur-my-shell%40aunetx/LICENSE)
+- [copyous@boerdereinar.dev](https://extensions.gnome.org/extension/8834/copyous/) [(GPLv3 LICENSE)](https://github.com/boerdereinar/copyous/blob/main/LICENSE)
+- [gsconnect@andyholmes.github.io](https://extensions.gnome.org/extension/1319/gsconnect/) [(MULTIPLE LICENSES)](https://github.com/GSConnect/gnome-shell-extension-gsconnect/tree/main/LICENSES)
+- [tilingshell@ferrarodomenico.com](https://extensions.gnome.org/extension/7065/tiling-shell/) [(GPLv3 LICENSE)](https://github.com/domferr/tilingshell/blob/main/LICENSE)
+
+The respective licenses for these projects are included in the final filesystem.
 
 # Translations
 
