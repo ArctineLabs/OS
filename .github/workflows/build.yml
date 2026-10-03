@@ -5,13 +5,11 @@ on:
   pull_request:
     branches:
       - main
-      - immutable
   schedule:
     - cron: '05 10 * * *'  # 10:05am UTC everyday
   push:
     branches:
       - main
-      - immutable
     paths-ignore:
       - '**/README.md'
   workflow_dispatch:
