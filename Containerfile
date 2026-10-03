@@ -59,8 +59,7 @@ RUN rm -rfv /milanium /airootfs
 
 LABEL \
     org.opencontainers.image.title="ArctineOS" \
-    org.opencontainers.image.description="ArctineOS base system - simple, opinionated, easy" \
-    org.opencontainers.image.version="26.10" \
+    org.opencontainers.image.description="ArctineOS - simple, opinionated, easy" \
     org.opencontainers.image.url="https://arctine.rootsource.cc/OS" \
     org.opencontainers.image.source="https://github.com/ArctineLabs/OS" \
     org.opencontainers.image.licenses="GPL-3.0-or-later" \
