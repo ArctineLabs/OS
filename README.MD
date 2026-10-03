@@ -1,20 +1,23 @@
 # ArctineOS
-The README is still being worked on. 
+An arch-based immutable distro designed for simplicity and ease of use, with (arguably) sane defaults.
 
-# Build
-To build, you use the `mkarctine` tool. Make sure it is in the root of the Git repository, and proceed to run the following commands:
+## :warning: For users still using the mutable version
+ArctineOS is switching to an immutable approach. Because of this, future updates performed on the mutable version may fail. To fix this, do one of the following:
+### 1. Backup everything and switch to the immutable version
+(instructions to follow)
+### 2. Pull updates from [distrolabs/ArctineOS](https://github.com/distrolabs/ArctineOS) instead
+To do this, you need to replace /OS/' remote with the one from distrolabs. This can be done in either two ways:
+#### sed
+A quick solution is to run this command in the terminal:
+```sudo sed -i 's#url = https://github.com/ArctineLabs/OS#url = https://github.com/distrolabs/ArctineOS#g' /OS/.git/config```
+This replaces the old remote URL with the distrolabs one
+#### Text editor
+Using administrative rights, open the /OS/.git/config file.
 
-```bash
-./mkarctine prep
-sudo ./mkarctine build
-```
+Locate the line that ```url = https://github.com/ArctineLabs/OS``` is on (usually line 7), and replace it with ```url = https://github.com/distrolabs/ArctineOS```.
 
-Every time you want to rebuild, it is recommended to clear out the tmp/ and out/ folders.
-
-```bash
-sudo ./mkarctine clean
-sudo ./mkarctine clean-out
-```
+# How to build/install
+As we slowly make the switch to an immutable ArctineOS, we are also currently reworking the way ArctineOS will be built, so there are no build instructions at the moment.
 
 # Acknowledgements/Licensing
 ArctineOS itself is licensed under the GPLv3-or-later, the license is found at the root of the repository in a file named `LICENSE`
@@ -26,6 +29,9 @@ The following files contain code derived from [bootcrew/mono](https://github.com
 - `scripts/bootc-rootfs.sh`
 - `scripts/build.sh`
 - `scripts/initramfs.sh`
+
+The following files contain code derived from [ArctineLabs/TyrianOS (sister project)](https://github.com/ArctineLabs/TyrianOS) (Copyright 2025 kevadesu, Apache License 2.0):
+- `.github/workflows/build.yml`
 
 ### GNOME Extensions (3rd-party)
 (found under airootfs/usr/share/gnome-shell/extensions/)
@@ -42,22 +48,3 @@ The respective licenses for these projects are included in the final filesystem.
 To translate, copy the respective en.arctinelocale file and change the "en" to the code of the language you want to translate a component into.
 
 The .arctinelocale files in question can be found under directories in the [Arctine Translations Library](https://github.com/ArctineLabs/OS/tree/main/airootfs/Arctine/Library/Translations/) under directories within.
-
-# Other
-> Old readme
-Hi, this is just a dummy README for now, if you want to build this config, clone the repo, cd to it, make an "out" dir, and run (as root):
-
-    mkarchiso -v -w /tmp/archiso-tmp -o /path/to/cloned-repo/out /path/to/cloned-repo/
-
-You need these packages installed on an Arch install at the bare minimum:
-- git
-- xorriso
-- arch-install-scripts
-- dosfstools
-- erofs-utils
-- libburn
-- libisoburn
-- libisofs
-- mtools
-- squashfs-tools
-- archiso

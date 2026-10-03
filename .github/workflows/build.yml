@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: "arctineos"  # the name of the image produced by this build, doesn't match repo names
+  IMAGE_NAME: "arctineos"  # the name of the image produced by this build, doesn't match repo names now does it
   IMAGE_DESC: "ArctineOS - simple, opinionated, easy"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
   ARTIFACTHUB_LOGO_URL: "https://raw.githubusercontent.com/ArctineLabs/OS/refs/heads/main/airootfs/Arctine/Filesystem/Replace/usr/share/pixmaps/archlinux-logo.png"  # You should put your own image here so that you get a fancy profile image on https://artifacthub.io/!
