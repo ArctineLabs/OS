@@ -5,7 +5,23 @@ pkgdesc="ArctineOS system configuration"
 arch=('any')
 url="https://github.com/ArctineLabs/OS"
 license=('GPL3')
-depends=('junction' 'base' 'wget' 'gnome-shell<1:51' 'gnome-shell>1:50.1-1' 'gnome-shell-extension-appindicator' 'gnome-shell-extension-arc-menu' 'gnome-shell-extension-dash-to-panel' 'gnome-shell-extension-desktop-icons-ng' 'networkmanager' 'dracut' 'pkgfile' 'gum' 'zenity' 'ttf-ibm-plex')
+depends=('base'
+    'dracut'
+    'gdm'
+    'gnome-browser-connector'
+    'gnome-control-center'
+    'gnome-shell<1:51'
+    'gnome-shell>1:50.1-1'
+    'gnome-shell-extension-appindicator'
+    'gnome-shell-extension-arc-menu'
+    'gnome-shell-extension-dash-to-panel'
+    'gnome-shell-extension-desktop-icons-ng'
+    'gum'
+    'networkmanager'
+    'pkgfile'
+    'wget'
+    'zenity'
+'ttf-ibm-plex')
 replaces=('betriebssystem')
 provides=('arcli')
 
@@ -29,17 +45,17 @@ package() {
     rm -rv $pkgdir/etc/systemd/system/etc-pacman.d-gnupg.mount
     rm -rv $pkgdir/etc/gdm/*
     rm -rv $pkgdir/etc/sudoers.d/*
-
+    
     chmod +x -v $pkgdir/Arctine/Scripts/*
     chmod +x -v $pkgdir/Arctine/Tools/ArCLI/Executables/arcli
     chmod +x -v $pkgdir/Arctine/Tools/Arctualiza/arctualiza
     chmod +x -v $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass
-
+    
     chmod +x -v $pkgdir/usr/bin/update-grub
-
+    
     mkdir -pv $pkgdir/usr/bin/
-
-    ln -sf $pkgdir/Arctine/Tools/ArCLI/Executables/arcli $pkgdir/usr/bin/arcli
-    ln -s $pkgdir/Arctine/Tools/Arctualiza/arctualiza $pkgdir/usr/bin/arctualiza
-    ln -s $pkgdir/Arctine/Tools/ZenityAskpass/zenityaskpass $pkgdir/usr/bin/zenityaskpass
+    
+    ln -sf /Arctine/Tools/ArCLI/Executables/arcli $pkgdir/usr/bin/arcli
+    ln -s /Arctine/Tools/Arctualiza/arctualiza $pkgdir/usr/bin/arctualiza
+    ln -s /Arctine/Tools/ZenityAskpass/zenityaskpass $pkgdir/usr/bin/zenityaskpass
 }
