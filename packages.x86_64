@@ -117,6 +117,7 @@ partimage
 pcsclite
 pkgfile
 plymouth
+podman
 ppp
 pptpclient
 pv
@@ -131,6 +132,7 @@ sdparm
 seahorse
 sequoia-sq
 sg3_utils
+skopeo
 smartmontools
 snapper
 snap-pac
