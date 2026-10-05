@@ -32,6 +32,7 @@ The following files contain code derived from [bootcrew/mono](https://github.com
 
 The following files contain code derived from [ArctineLabs/TyrianOS (sister project)](https://github.com/ArctineLabs/TyrianOS) (Copyright 2025 kevadesu, Apache License 2.0):
 - `.github/workflows/build.yml`
+- `.github/workflows/build-iso.yml` (partially)
 
 ### GNOME Extensions (3rd-party)
 (found under airootfs/usr/share/gnome-shell/extensions/)
