@@ -4,6 +4,7 @@ arch-install-scripts
 archinstall
 b43-fwcutter
 base
+base-devel
 bcachefs-tools
 bind
 bolt
@@ -13,6 +14,7 @@ btrfs-progs
 clonezilla
 cloud-init
 cryptsetup
+curl
 darkhttpd
 ddrescue
 debugedit
@@ -34,6 +36,7 @@ extension-manager
 f2fs-tools
 fakeroot
 fatresize
+file
 firefox
 foot-terminfo
 fsarchiver
@@ -119,6 +122,7 @@ pkgfile
 plymouth
 ppp
 pptpclient
+procps-ng
 pv
 qemu-guest-agent
 refind
