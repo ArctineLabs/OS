@@ -48,6 +48,7 @@ install_aur() {
 mkdir -p /pkgout
 install_aur libsepol
 install_aur libselinux
+install_aur bootupd
 
 mv /pkgout/libsepol-[0-9]*.pkg.tar.zst /pkgout/libsepol.pkg.tar.zst
 mv /pkgout/libselinux-[0-9]*.pkg.tar.zst /pkgout/libselinux.pkg.tar.zst
