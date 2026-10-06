@@ -30,14 +30,14 @@ bootc $image_name=image_name $image_tag=image_tag *ARGS:
         -v /dev:/dev \
         -e RUST_LOG=debug \
         -v "{{ base_dir }}:/data" \
-        "${image_name}:${image_tag}" bootc {{ ARGS }}
+        "docker://ghcr.io/arctinelabs/arctineos:latest" bootc {{ ARGS }}
 
 disk-image $image_name=image_name $image_tag=image_tag $base_dir=base_dir $filesystem=filesystem:
     #!/usr/bin/env bash
     if [ ! -e "${base_dir}/bootable.img" ] ; then
         fallocate -l 20G "${base_dir}/bootable.img"
     fi
-    just bootc $image_name $image_tag install to-disk --composefs-backend --via-loopback /data/bootable.img --filesystem "${filesystem}" --wipe --bootloader systemd
+    just bootc $image_name $image_tag install to-disk --composefs-backend --via-loopback /data/bootable.img --filesystem "${filesystem}" --wipe --bootloader systemd --source-imgref docker://ghcr.io/arctinelabs/arctineos:latest
 
 rechunk $image_name=image_name:
     #!/usr/bin/env bash

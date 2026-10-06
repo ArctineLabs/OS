@@ -14,9 +14,11 @@ FROM quay.io/archlinux/archlinux:latest AS base
 
 FROM base AS builder
 
-RUN pacman -Syu --noconfirm --needed base-devel git make cargo go-md2man ostree glib2 openssl zstd zlib rust pkgconf glibc clang
+RUN pacman -Syu --noconfirm --needed base-devel git make cargo go-md2man ostree glib2 openssl zstd zlib rust pkgconf glibc clang efibootmgr grub gcc-libs
 
 WORKDIR /home/build
+RUN mkdir -p /home/nobody \
+    && chown nobody:nobody -Rv /home/nobody
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     /ctx/scripts/build.sh
 
