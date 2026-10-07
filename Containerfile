@@ -28,6 +28,13 @@ COPY --from=builder /pkgout /selinuxpkg
 RUN grep "= */var" /etc/pacman.conf | sed "/= *\/var/s/.*=// ; s/ //" | xargs -n1 sh -c 'mkdir -p "/usr/lib/sysimage/$(dirname $(echo $1 | sed "s@/var/@@"))" && mv -v "$1" "/usr/lib/sysimage/$(echo "$1" | sed "s@/var/@@")"' '' && \
     sed -i -e "/= *\/var/ s/^#//" -e "s@= */var@= /usr/lib/sysimage@g" -e "/DownloadUser/d" /etc/pacman.conf
 
+## THIS HAS BEEN TAKEN FROM https://github.com/bootcrew/mono/pull/9
+# Remove NoExtract rules, otherwise no additional languages and help pages can be installed
+# See https://gitlab.archlinux.org/archlinux/archlinux-docker/-/blob/master/pacman-conf.d-noextract.conf?ref_type=heads
+RUN sed -i 's/^[[:space:]]*NoExtract/#&/' /etc/pacman.conf
+
+RUN --mount=type=tmpfs,dst=/tmp --mount=type=cache,dst=/usr/lib/sysimage/cache/pacman pacman -Sy glibc --noconfirm
+
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     pacman -Syu --noconfirm $(cat /ctx/packagelist.x64)
 
@@ -65,7 +72,18 @@ RUN --mount=type=cache,dst=/var/cache \
     /usr/bin/systemctl preset brew-update.timer && \
     /usr/bin/systemctl preset brew-upgrade.timer
 
+WORKDIR /
 RUN rm -rfv /milanium /airootfs
+RUN echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel && \
+    chmod 440 /etc/sudoers.d/10-wheel && \
+    visudo -c
+
+RUN chmod 4755 /usr/bin/newgidmap && \
+    chmod 4755 /usr/bin/newuidmap
+
+RUN locale-gen
+
+RUN /usr/bin/systemctl enable NetworkManager
 
 LABEL \
     org.opencontainers.image.title="ArctineOS" \

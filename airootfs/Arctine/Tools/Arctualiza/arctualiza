@@ -34,52 +34,7 @@ gui() {
 }
 
 upgrade() {
-    if zenity --question --text "Perform system update?\nSave all unsaved work, as this will restart your device."; then
-        true
-    else
-        exit 1
-    fi
-
-    (
-        pushd /OS/arctine-pkg
-            echo "11"
-            echo "# Discarding any changes made in the source code directory..."
-            git stash || echo "# Failed to stash commits"
-            echo "22"
-            echo "# Pulling latest commits from OS source..."
-            git pull || echo "# Failed to pull"
-            echo "33"
-            echo "# Making sure \"nobody:nobody\" owns the OS source directory..."
-            chown nobody:nobody -Rv . || echo "# Failed to change ownership to nobody:nobody"
-            echo "44"
-            echo "# Sourcing PKGBUILD..."
-            source PKGBUILD || echo "# Failed to source PKGBUILD"
-            echo "55"
-            echo "# Updating all installed packages..."
-            pacman -Syu --noconfirm || echo "# Failed to update all packages"
-            echo "66"
-            echo "# Installing all needed dependencies for the update..."
-            # shellcheck disable=SC2154
-            pacman -S "${depends[@]}" --noconfirm --needed || echo "# Failed to install dependencies"
-            echo "77"
-            echo "# Building update package..."
-            sudo -u nobody makepkg -srf || echo "# Failed to build update package"
-            echo "88"
-            echo "# Installing update..."
-            # shellcheck disable=SC2154
-            pacman -Uv ./"${pkgname}"-"${pkgver}"-"${pkgrel}"-"${arch[*]}".pkg.tar.zst --noconfirm || echo "# Failed to install update"
-            echo "99"
-            echo "# Finishing up..."
-            chmod +x /Arctine/Tools/ArCLI/Modules/* || echo "# Failed to add executable flag to ArCLI modules"
-            echo "100"
-            echo "# Restarting..."
-        popd
-        sleep 0.5;reboot
-    ) | zenity --progress \
-  --title="Updating system..." \
-  --text="Preparation..." \
-  --percentage=0 \
-  --no-cancel
+    kgx -e "bootc upgrade --apply"
 }
 
 error() {

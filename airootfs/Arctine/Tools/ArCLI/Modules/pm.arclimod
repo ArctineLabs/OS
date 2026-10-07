@@ -115,33 +115,7 @@ pm.subtract() {
 }
 
 pm.sysupdate() {
-    read -rp "[i] Perform system update? Save all unsaved work, as this will restart your device. [Y/n] " confirm
-    case "$confirm" in
-        Y|y|yes|Yes|YES)
-            true
-        ;;
-        *)
-            echo "[i] Aborted."
-            exit 1
-        ;;
-    esac
-    # shellcheck disable=SC2164
-    pushd /OS/arctine-pkg
-        gum spin --spinner points --title "Discarding any changes made..." -- git stash || pm.sysupdate.error "Failed to stash commits"
-        gum spin --spinner points --title "Pulling latest commit from OS source..." -- git pull || pm.sysupdate.error "Failed to pull"
-        gum spin --spinner points --title "Ensuring \"nobody:nobody\" owns ArctineOS source directory..." -- chown nobody:nobody -Rv . || pm.sysupdate.error "Failed to change ownership to nobody:nobody"
-        source PKGBUILD || pm.sysupdate.error "Failed to source PKGBUILD"
-        pacman -Syu --noconfirm || pm.sysupdate.error "Failed to update all packages"
-        # shellcheck disable=SC2154
-        pacman -S "${depends[@]}" --noconfirm --needed || pm.sysupdate.error "Failed to install dependencies"
-        gum spin --spinner points --title "Building update..." -- sudo -u nobody makepkg -srf || pm.sysupdate.error "Failed to build update package"
-        # shellcheck disable=SC2154
-        pacman -Uv ./"${pkgname}"-"${pkgver}"-"${pkgrel}"-"${arch[*]}".pkg.tar.zst --noconfirm || pm.sysupdate.error "Failed to install update"
-        chmod +x /Arctine/Tools/ArCLI/Modules/* || pm.sysupdate.error "Failed to add executable flag to ArCLI modules"
-    # shellcheck disable=SC2164
-    popd
-    echo "[i] System update completed successfully. Restarting in 5 seconds..."
-    sleep 5;reboot
+    sudo bootc upgrade
 }
 
 pm.sysupdate.error() {
