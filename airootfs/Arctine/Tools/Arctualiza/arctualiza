@@ -17,11 +17,13 @@ main() {
 }
 
 gui() {
+    # shellcheck disable=SC1091
+    source /etc/os-release
     GUI_OPTION=$(zenity --question --title="Update ArctineOS" \
         --text="$(pacman -Qiq milanium | head -n 2)" \
-        --ok-label "Update system" \
+        --ok-label "Check and update system" \
         --cancel-label "Exit updater" \
-        --extra-button "View commit history" \
+        --extra-button "View release history" \
         --icon software-update-available-symbolic) || export EXIT=yes
     export GUI_OPTION
     if [[ $EXIT == "yes" ]]; then
@@ -34,7 +36,8 @@ gui() {
 }
 
 upgrade() {
-    kgx -e "bootc upgrade --apply"
+    # run bootc upgrade with administrative perms | take the output of the command and forward it except every line starts with # | render it in Zenity
+    sudo -A bootc upgrade | while IFS= read -r line; do echo "# $line"; done | zenity --progress --title=Updating system... --pulsate
 }
 
 error() {

@@ -55,7 +55,6 @@ gnome-characters
 gnome-clocks
 gnome-color-manager
 gnome-connections
-gnome-console
 gnome-contacts
 gnome-control-center
 gnome-disk-utility
@@ -168,6 +167,7 @@ podman
 ppp
 pptpclient
 procps-ng
+ptyxis
 pv
 qemu-guest-agent
 refind

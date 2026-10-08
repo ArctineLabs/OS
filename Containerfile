@@ -33,10 +33,12 @@ RUN grep "= */var" /etc/pacman.conf | sed "/= *\/var/s/.*=// ; s/ //" | xargs -n
 # See https://gitlab.archlinux.org/archlinux/archlinux-docker/-/blob/master/pacman-conf.d-noextract.conf?ref_type=heads
 RUN sed -i 's/^[[:space:]]*NoExtract/#&/' /etc/pacman.conf
 
+RUN pacman -Syu --noconfirm
+
 RUN --mount=type=tmpfs,dst=/tmp --mount=type=cache,dst=/usr/lib/sysimage/cache/pacman pacman -Sy glibc --noconfirm
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    pacman -Syu --noconfirm $(cat /ctx/packagelist.x64)
+    pacman -Sy --noconfirm $(cat /ctx/packagelist.x64)
 
 RUN pacman -U --noconfirm /selinuxpkg/*.pkg.tar.zst \
     && rm -rf /selinuxpkg
@@ -84,6 +86,8 @@ RUN chmod 4755 /usr/bin/newgidmap && \
 RUN locale-gen
 
 RUN /usr/bin/systemctl enable NetworkManager
+
+RUN chmod +x /Arctine/GumpackNG/*.sh
 
 LABEL \
     org.opencontainers.image.title="ArctineOS" \
