@@ -38,6 +38,9 @@ export const KEYS = [
             { type: Type.B, name: "override-background" },
             { type: Type.I, name: "style-panel" },
             { type: Type.B, name: "override-background-dynamically" },
+            { type: Type.I, name: "override-background-dynamically-mode" },
+            { type: Type.B, name: "gradient-panel" },
+            { type: Type.I, name: "gradient-panel-mode" },
         ]
     },
     {
@@ -65,6 +68,7 @@ export const KEYS = [
             { type: Type.I, name: "opacity" },
             { type: Type.B, name: "dynamic-opacity" },
             { type: Type.B, name: "blur-on-overview" },
+            { type: Type.B, name: "unblur-when-fullscreen" },
             { type: Type.B, name: "enable-all" },
             { type: Type.AS, name: "whitelist" },
             { type: Type.AS, name: "blacklist" },
@@ -94,6 +98,25 @@ export const KEYS = [
         component: "screenshot", schemas: [
             { type: Type.B, name: "blur" },
             { type: Type.S, name: "pipeline" },
+        ]
+    },
+    {
+        component: "popup", schemas: [
+            { type: Type.B, name: "blur" },
+            { type: Type.B, name: "static-blur" },
+            { type: Type.S, name: "pipeline" },
+            { type: Type.I, name: "sigma" },
+            { type: Type.D, name: "brightness" },
+            { type: Type.I, name: "corner-radius" },
+            { type: Type.I, name: "menu-corner-radius" },
+            { type: Type.I, name: "quick-settings-corner-radius" },
+            { type: Type.I, name: "notification-corner-radius" },
+            { type: Type.I, name: "osd-corner-radius" },
+            { type: Type.I, name: "dialog-corner-radius" },
+            { type: Type.I, name: "osk-corner-radius" },
+            { type: Type.B, name: "override-background" },
+            { type: Type.B, name: "preserve-shell-theme" },
+            { type: Type.I, name: "style-popup" },
         ]
     },
     {

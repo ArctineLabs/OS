@@ -12,41 +12,8 @@ import { DerivativeEffect } from './derivative.js';
 import { RgbToHslEffect } from './rgb_to_hsl.js';
 import { HslToRgbEffect } from './hsl_to_rgb.js';
 import { LuminosityEffect } from './luminosity.js';
-
-// We do in this way because I've not found another way to store our preferences in a dictionnary
-// while calling `gettext` on it while in preferences. Not so pretty, but works.
-export function get_effects_groups(_ = _ => "") {
-    return {
-        blur_effects: {
-            name: _("Blur effects"),
-            contains: [
-                "native_static_gaussian_blur",
-                "gaussian_blur",
-                "monte_carlo_blur"
-            ]
-        },
-        texture_effects: {
-            name: _("Texture effects"),
-            contains: [
-                "downscale",
-                "upscale",
-                "pixelize",
-                "derivative",
-                "noise",
-                "color",
-                "luminosity",
-                "rgb_to_hsl",
-                "hsl_to_rgb"
-            ]
-        },
-        shape_effects: {
-            name: _("Shape effects"),
-            contains: [
-                "corner"
-            ]
-        }
-    };
-};
+import { RefractionEffect } from './refraction.js';
+export { get_effects_groups } from './effect_groups.js';
 
 export function get_supported_effects(_ = () => "") {
     return {
@@ -378,6 +345,140 @@ export function get_supported_effects(_ = () => "") {
             }
         },
 
+        refraction: {
+            class: RefractionEffect,
+            name: _("Liquid Glass"),
+            description: _("A glossy translucent material with edge refraction, rim lighting, tint, and inner shadow."),
+            is_advanced: false,
+            editable_params: {
+                strength: {
+                    name: _("Refraction scale"),
+                    description: _("How strongly the glass bends the sampled blur texture."),
+                    type: "float",
+                    min: 0.,
+                    max: 1.,
+                    increment: 0.01,
+                    big_increment: 0.1,
+                    digits: 2
+                },
+                blur_radius: {
+                    name: _("Blur radius"),
+                    description: _("Blurs the sampled backdrop before the liquid-glass shader is applied."),
+                    type: "float",
+                    min: 0.,
+                    max: 48.,
+                    increment: 1.,
+                    big_increment: 10.,
+                    digits: 0
+                },
+                edge_size: {
+                    name: _("Bezel width"),
+                    description: _("How far the liquid-glass lens reaches inward from the edge."),
+                    type: "float",
+                    min: 1.,
+                    max: 100.,
+                    increment: 1.,
+                    big_increment: 10.,
+                    digits: 0
+                },
+                rim_width: {
+                    name: _("Rim spread"),
+                    description: _("How far the refraction eases inward from the glass edge."),
+                    type: "float",
+                    min: 1.,
+                    max: 6.5,
+                    increment: 0.1,
+                    big_increment: 0.5,
+                    digits: 2
+                },
+                falloff: {
+                    name: _("Glass thickness"),
+                    description: _("Depth used by the Snell-style refraction profile."),
+                    type: "float",
+                    min: 0.25,
+                    max: 8.,
+                    increment: 0.05,
+                    big_increment: 0.5,
+                    digits: 2
+                },
+                corner_radius: {
+                    name: _("Corner radius"),
+                    description: _("The rounded shape used for the glass edge and highlight."),
+                    type: "float",
+                    min: 0.,
+                    max: 100.,
+                    increment: 1.,
+                    big_increment: 10.,
+                    digits: 0
+                },
+                gloss: {
+                    name: _("Fresnel glare"),
+                    description: _("Strength of the Schlick fresnel rim glare from the glass edge."),
+                    type: "float",
+                    min: 0.,
+                    max: 1.,
+                    increment: 0.01,
+                    big_increment: 0.1,
+                    digits: 2
+                },
+                tint: {
+                    name: _("Tint strength"),
+                    description: _("Amount of subtle milky glass tint over the blurred texture."),
+                    type: "float",
+                    min: 0.,
+                    max: 1.,
+                    increment: 0.01,
+                    big_increment: 0.1,
+                    digits: 2
+                },
+                tint_color: {
+                    name: _("Tint color"),
+                    description: _("Color blended over the blurred texture, weighted by the tint strength."),
+                    type: "rgba",
+                    use_alpha: true
+                },
+                backdrop_zoom: {
+                    name: _("Backdrop zoom"),
+                    description: _("Zoom level of the backdrop visible through the glass."),
+                    type: "float",
+                    min: 0.1,
+                    max: 4.,
+                    increment: 0.01,
+                    big_increment: 0.1,
+                    digits: 2
+                },
+                shadow: {
+                    name: _("Inner shadow"),
+                    description: _("Darkens the lower and inner edge for a deeper glass surface."),
+                    type: "float",
+                    min: 0.,
+                    max: 1.,
+                    increment: 0.01,
+                    big_increment: 0.1,
+                    digits: 2
+                },
+                rgb_fringing: {
+                    name: _("Chromatic dispersion"),
+                    description: _("Physical per-channel refraction dispersion at the glass edge."),
+                    type: "float",
+                    min: 0.,
+                    max: 1.,
+                    increment: 0.01,
+                    big_increment: 0.1,
+                    digits: 2
+                },
+                texture_repeat: {
+                    name: _("Edge behavior"),
+                    description: _("How texture coordinates outside the actor are sampled."),
+                    type: "dropdown",
+                    options: [
+                        _("Clamp"),
+                        _("Mirror")
+                    ]
+                }
+            }
+        },
+
         rgb_to_hsl: {
             class: RgbToHslEffect,
             name: _("RGB to HSL (advanced effect)"),
@@ -402,7 +503,7 @@ export function get_supported_effects(_ = () => "") {
             editable_params: {
                 radius: {
                     name: _("Radius"),
-                    description: _("The radius of the corner. GNOME apps use a radius of 12 px by default."),
+                    description: _("The radius of the corner. GNOME apps use a radius of 15 px by default."),
                     type: "integer",
                     min: 0,
                     max: 150,

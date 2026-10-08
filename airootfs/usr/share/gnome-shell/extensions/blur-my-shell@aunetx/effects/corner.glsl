@@ -5,9 +5,9 @@ uniform sampler2D tex;
 uniform float radius;
 uniform float width;
 uniform float height;
-uniform bool corners_top;
-uniform bool corners_bottom;
-uniform bool straight_corners;
+uniform int corners_top;
+uniform int corners_bottom;
+uniform int straight_corners;
 
 uniform float clip_x0;
 uniform float clip_y0;
@@ -30,17 +30,20 @@ float circle_bounds(vec2 p, vec2 center, float clip_radius) {
 }
 
 vec4 getTexture(vec2 uv) {
-    if (uv.x < 2. / width)
-        uv.x = 2. / width;
+    float w = max(1.0, width);
+    float h = max(1.0, height);
 
-    if (uv.y < 2. / height)
-        uv.y = 2. / height;
+    if (uv.x < 2. / w)
+        uv.x = 2. / w;
 
-    if (uv.x > 1. - 3. / width)
-        uv.x = 1. - 3. / width;
+    if (uv.y < 2. / h)
+        uv.y = 2. / h;
 
-    if (uv.y > 1. - 3. / height)
-        uv.y = 1. - 3. / height;
+    if (uv.x > 1. - 3. / w)
+        uv.x = 1. - 3. / w;
+
+    if (uv.y > 1. - 3. / h)
+        uv.y = 1. - 3. / h;
 
     return texture2D(tex, uv);
 }
@@ -66,11 +69,11 @@ float rounded_rect_coverage(vec2 p, vec4 bounds, float clip_radius) {
     float center_top = bounds.y + clip_radius;
     float center_bottom = bounds.w - clip_radius;
 
-    if (straight_corners)
+    if (straight_corners != 0)
         return 1.0;
-    else if (corners_top && p.y < center_top)
+    else if (corners_top != 0 && p.y < center_top)
         center.y = center_top + 2.;
-    else if (corners_bottom && p.y > center_bottom)
+    else if (corners_bottom != 0 && p.y > center_bottom)
         center.y = center_bottom - 1.;
     else
         return 1.0;

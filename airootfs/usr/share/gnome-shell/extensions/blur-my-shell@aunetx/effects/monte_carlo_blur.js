@@ -1,11 +1,13 @@
 import GObject from 'gi://GObject';
 
 import * as utils from '../conveniences/utils.js';
+import * as uniforms from '../conveniences/shader_uniforms.js';
 const St = await utils.import_in_shell_only('gi://St');
 const Shell = await utils.import_in_shell_only('gi://Shell');
 const Clutter = await utils.import_in_shell_only('gi://Clutter');
 
 const SHADER_FILENAME = 'monte_carlo_blur.glsl';
+const SHADER_SOURCE = utils.get_shader_source(Shell, SHADER_FILENAME, import.meta.url);
 const DEFAULT_PARAMS = {
     radius: 2., iterations: 5, brightness: .6,
     width: 0, height: 0, use_base_pixel: true,
@@ -13,9 +15,7 @@ const DEFAULT_PARAMS = {
 };
 
 
-export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
-    { default_params: DEFAULT_PARAMS } :
-    new GObject.registerClass({
+const MONTE_CARLO_BLUR_EFFECT_META = {
         GTypeName: "MonteCarloBlurEffect",
         Properties: {
             'radius': GObject.ParamSpec.double(
@@ -73,21 +73,22 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
                 true,
             ),
         }
-    }, class MonteCarloBlurEffect extends Clutter.ShaderEffect {
+};
+
+const MonteCarloBlurEffectClass = utils.IS_IN_PREFERENCES ? null : class MonteCarloBlurEffect extends Clutter.ShaderEffect {
+
         constructor(params) {
-            super(params);
+            super();
+
+            utils.initialize_shader_effect(this, SHADER_SOURCE);
+
 
             utils.setup_params(this, params);
-
-            // set shader source
-            this._source = utils.get_shader_source(Shell, SHADER_FILENAME, import.meta.url);
-            if (this._source)
-                this.set_shader_source(this._source);
 
             const theme_context = St.ThemeContext.get_for_stage(global.stage);
             theme_context.connectObject(
                 'notify::scale-factor',
-                _ => this.set_uniform_value('radius',
+                _ => uniforms.set_uniform(this, 'radius',
                     parseFloat(this._radius * theme_context.scale_factor - 1e-6)
                 ),
                 this
@@ -108,7 +109,7 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
 
                 const scale_factor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
 
-                this.set_uniform_value('radius', parseFloat(this._radius * scale_factor - 1e-6));
+                uniforms.set_uniform(this, 'radius', parseFloat(this._radius * scale_factor - 1e-6));
                 this.set_enabled(this.radius > 0. && this.iterations > 0);
             }
         }
@@ -121,7 +122,7 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
             if (this._iterations !== value) {
                 this._iterations = value;
 
-                this.set_uniform_value('iterations', this._iterations);
+                uniforms.set_uniform(this, 'iterations', this._iterations);
                 this.set_enabled(this.radius > 0. && this.iterations > 0);
             }
         }
@@ -134,7 +135,7 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
             if (this._brightness !== value) {
                 this._brightness = value;
 
-                this.set_uniform_value('brightness', parseFloat(this._brightness - 1e-6));
+                uniforms.set_uniform(this, 'brightness', parseFloat(this._brightness - 1e-6));
             }
         }
 
@@ -143,10 +144,11 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
         }
 
         set width(value) {
-            if (this._width !== value) {
-                this._width = value;
+            const v = Math.max(1, value || 1);
+            if (this._width !== v) {
+                this._width = v;
 
-                this.set_uniform_value('width', parseFloat(this._width + 3.0 - 1e-6));
+                uniforms.set_uniform(this, 'width', parseFloat(this._width + 3.0 - 1e-6));
             }
         }
 
@@ -155,10 +157,11 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
         }
 
         set height(value) {
-            if (this._height !== value) {
-                this._height = value;
+            const v = Math.max(1, value || 1);
+            if (this._height !== v) {
+                this._height = v;
 
-                this.set_uniform_value('height', parseFloat(this._height + 3.0 - 1e-6));
+                uniforms.set_uniform(this, 'height', parseFloat(this._height + 3.0 - 1e-6));
             }
         }
 
@@ -170,7 +173,7 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
             if (this._use_base_pixel !== value) {
                 this._use_base_pixel = value;
 
-                this.set_uniform_value('use_base_pixel', this._use_base_pixel ? 1 : 0);
+                uniforms.set_uniform(this, 'use_base_pixel', this._use_base_pixel ? 1 : 0);
             }
         }
 
@@ -182,7 +185,7 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
             if (this._prefer_closer_pixels !== value) {
                 this._prefer_closer_pixels = value;
 
-                this.set_uniform_value('prefer_closer_pixels', this._prefer_closer_pixels ? 1 : 0);
+                uniforms.set_uniform(this, 'prefer_closer_pixels', this._prefer_closer_pixels ? 1 : 0);
             }
         }
 
@@ -204,4 +207,13 @@ export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES ?
 
             super.vfunc_set_actor(actor);
         }
-    });
+
+        vfunc_paint_target(paint_node, paint_context) {
+            uniforms.upload_uniforms(this);
+            super.vfunc_paint_target(paint_node, paint_context);
+        }
+};
+
+export const MonteCarloBlurEffect = utils.IS_IN_PREFERENCES
+    ? { default_params: DEFAULT_PARAMS }
+    : utils.register_shader_effect(MONTE_CARLO_BLUR_EFFECT_META, MonteCarloBlurEffectClass, SHADER_SOURCE);
