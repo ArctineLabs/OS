@@ -89,8 +89,6 @@ RUN /usr/bin/systemctl enable NetworkManager
 
 RUN chmod +x /Arctine/GumpackNG/*.sh
 
-RUN ln -s /usr/share/glib-2.0 /usr/local/share/glib-2.0
-
 LABEL \
     org.opencontainers.image.title="ArctineOS" \
     org.opencontainers.image.description="ArctineOS - simple, opinionated, easy" \
