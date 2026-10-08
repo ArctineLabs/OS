@@ -2,7 +2,11 @@
 
 # Made by Arctine Laboratories, for ArctineOS. Licensed under GPL together with ArctineOS!
 if [[ -z ${ArCLI_DIR:-} ]]; then
-    export ArCLI_DIR="/var/home/$USER/.arcli"
+    if [[ ! -d /Arctine/Tools/ArCLI ]]; then
+        export ArCLI_DIR="/var/home/$USER/.arcli"
+    else
+        export ArCLI_DIR="/Arctine/Tools/ArCLI"
+    fi
 
     if [ ! -d "$DIR" ]; then
         mkdir -v "$DIR"
