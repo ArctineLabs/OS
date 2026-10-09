@@ -26,8 +26,7 @@ installation() {
     sudo bootc install to-disk "$TO_DISK" \
       --wipe \
       --filesystem btrfs \
-      --bootloader systemd \
-      --composefs-backend \
+      --bootloader grub \
       --source-imgref docker://ghcr.io/arctinelabs/arctineos:latest \
       --target-imgref ghcr.io/arctinelabs/arctineos:latest | while IFS= read -r line; do echo "# $line"; done | zenity --progress --title=Updating system... --pulsate
 }

@@ -89,6 +89,8 @@ RUN /usr/bin/systemctl enable NetworkManager
 
 RUN chmod +x /Arctine/GumpackNG/*.sh
 
+RUN bootupctl backend generate-update-metadata
+
 LABEL \
     org.opencontainers.image.title="ArctineOS" \
     org.opencontainers.image.description="ArctineOS - simple, opinionated, easy" \
