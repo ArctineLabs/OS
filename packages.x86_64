@@ -13,6 +13,7 @@ bolt
 brltty
 broadcom-wl-dkms
 btrfs-progs
+bubblewrap
 clonezilla
 cloud-init
 cryptsetup
