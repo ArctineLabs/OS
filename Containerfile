@@ -12,19 +12,10 @@ COPY packages.x86_64 /packagelist.x64
 # Arch Linux itself
 FROM quay.io/archlinux/archlinux:latest AS base
 
-FROM base AS builder
-
-RUN pacman -Syu --noconfirm --needed base-devel git make cargo go-md2man ostree glib2 openssl zstd zlib rust pkgconf glibc clang efibootmgr grub gcc-libs
-
-WORKDIR /home/build
-RUN mkdir -p /home/nobody \
-    && chown nobody:nobody -Rv /home/nobody
-RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    /ctx/scripts/build.sh
-
 FROM base AS system
-COPY --from=builder /output /
-COPY --from=builder /pkgout /selinuxpkg
+
+# bootc packages obtained from https://github.com/distrolabs/ABBoC
+COPY --from=ghcr.io/distrolabs:abboc /pkgout /bootcpkgs
 RUN grep "= */var" /etc/pacman.conf | sed "/= *\/var/s/.*=// ; s/ //" | xargs -n1 sh -c 'mkdir -p "/usr/lib/sysimage/$(dirname $(echo $1 | sed "s@/var/@@"))" && mv -v "$1" "/usr/lib/sysimage/$(echo "$1" | sed "s@/var/@@")"' '' && \
     sed -i -e "/= *\/var/ s/^#//" -e "s@= */var@= /usr/lib/sysimage@g" -e "/DownloadUser/d" /etc/pacman.conf
 
@@ -40,8 +31,8 @@ RUN --mount=type=tmpfs,dst=/tmp --mount=type=cache,dst=/usr/lib/sysimage/cache/p
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     pacman -Sy --noconfirm $(cat /ctx/packagelist.x64)
 
-RUN pacman -U --noconfirm /selinuxpkg/*.pkg.tar.zst \
-    && rm -rf /selinuxpkg
+RUN pacman -U --noconfirm /bootcpkgs/*.pkg.tar.zst \
+    && rm -rf /bootcpkgs
 
 COPY --from=ctx /milanium /milanium
 COPY --from=ctx /airootfs /airootfs
@@ -89,10 +80,11 @@ RUN /usr/bin/systemctl enable NetworkManager
 
 RUN chmod +x /Arctine/GumpackNG/*.sh
 
-RUN mkdir -p /usr/lib/bootupd/updates /usr/lib/bootupd/components /boot/efi /boot/grub
-RUN if [ -d /usr/share/grub ]; then cp -r /usr/share/grub/* /boot/grub/ || true; fi
-RUN mkdir -p /run 
-RUN --mount=type=tmpfs,dst=/tmp bootupctl backend generate-update-metadata /
+# Either to be fixed, or to be completely removed.
+# RUN mkdir -p /usr/lib/bootupd/updates /usr/lib/bootupd/components /boot/efi /boot/grub
+# RUN if [ -d /usr/share/grub ]; then cp -r /usr/share/grub/* /boot/grub/ || true; fi
+# RUN mkdir -p /run 
+# RUN --mount=type=tmpfs,dst=/tmp bootupctl backend generate-update-metadata /
 
 LABEL \
     org.opencontainers.image.title="ArctineOS" \
