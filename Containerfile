@@ -89,8 +89,9 @@ RUN /usr/bin/systemctl enable NetworkManager
 
 RUN chmod +x /Arctine/GumpackNG/*.sh
 
-RUN mkdir -p /usr/lib/bootupd/updates || true
-RUN bootupctl backend generate-update-metadata /
+RUN mkdir -p /usr/lib/bootupd/updates /usr/lib/bootupd/components /boot/efi /boot/grub
+RUN if [ -d /usr/share/grub ]; then cp -r /usr/share/grub/* /boot/grub/ || true; fi
+RUN --mount=type=tmpfs,dst=/tmp bootupctl backend generate-update-metadata /
 
 LABEL \
     org.opencontainers.image.title="ArctineOS" \
