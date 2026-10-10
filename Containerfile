@@ -15,7 +15,7 @@ FROM quay.io/archlinux/archlinux:latest AS base
 FROM base AS system
 
 # bootc packages obtained from https://github.com/distrolabs/ABBoC
-COPY --from=ghcr.io/distrolabs:abboc /pkgout /bootcpkgs
+COPY --from=ghcr.io/distrolabs/abboc:latest /pkgout /bootcpkgs
 RUN grep "= */var" /etc/pacman.conf | sed "/= *\/var/s/.*=// ; s/ //" | xargs -n1 sh -c 'mkdir -p "/usr/lib/sysimage/$(dirname $(echo $1 | sed "s@/var/@@"))" && mv -v "$1" "/usr/lib/sysimage/$(echo "$1" | sed "s@/var/@@")"' '' && \
     sed -i -e "/= *\/var/ s/^#//" -e "s@= */var@= /usr/lib/sysimage@g" -e "/DownloadUser/d" /etc/pacman.conf
 
