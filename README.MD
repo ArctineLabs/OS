@@ -1,5 +1,8 @@
 # ArctineOS
 An arch-based immutable distro designed for simplicity and ease of use, with (arguably) sane defaults.
+[![Build ArctineOS image](https://github.com/ArctineLabs/OS/actions/workflows/build.yml/badge.svg)](https://github.com/ArctineLabs/OS/actions/workflows/build.yml) [![Build ArctineOS ISO](https://github.com/ArctineLabs/OS/actions/workflows/build-iso.yml/badge.svg)](https://github.com/ArctineLabs/OS/actions/workflows/build-iso.yml)
+
+To check out information about the OS itself, rather than this repo or its development, [[check the website!]](https://arctine.rootsource.cc/OS)
 
 ## :warning: For users still using the mutable version
 ArctineOS is switching to an immutable approach. Because of this, future updates performed on the mutable version may fail. To fix this, do one of the following:
@@ -17,7 +20,42 @@ Using administrative rights, open the /OS/.git/config file.
 Locate the line that ```url = https://github.com/ArctineLabs/OS``` is on (usually line 7), and replace it with ```url = https://github.com/distrolabs/ArctineOS```.
 
 # How to build/install
-As we slowly make the switch to an immutable ArctineOS, we are also currently reworking the way ArctineOS will be built, so there are no build instructions at the moment.
+
+## Building
+Dependencies: `podman`, `just`
+To locally build ArctineOS, clone this repository then run `just build`
+
+```bash
+git clone https://github.com/ArctineLabs/OS.git
+cd OS/
+just build
+```
+
+## Installing
+To install ArctineOS, either download the [live ISO](https://github.com/ArctineLabs/OS/actions/runs/38091085428/artifacts/11684316349) which automatically launches the installer on startup, or run the following command on a system/live ISO with bootc
+```bash
+sudo bootc install to-disk /dev/(preferred disk) \
+--wipe \
+      --filesystem btrfs \
+      --bootloader systemd \
+      --composefs-backend \
+      --source-imgref docker://ghcr.io/arctinelabs/arctineos:latest \
+      --target-imgref ghcr.io/arctinelabs/arctineos:latest
+```
+Alternatively for systems without bootc but with podman:
+```bash
+sudo podman run --rm --privileged --pid=host --ipc=host \
+  -v /dev:/dev \
+  -v /var/lib/containers:/var/lib/containers \
+  --security-opt label=disable \
+  ghcr.io/arctinelabs/arctineos:latest \
+  bootc install to-disk /dev/(preferred disk) --wipe \
+      --filesystem btrfs \
+      --bootloader systemd \
+      --composefs-backend \
+      --source-imgref docker://ghcr.io/arctinelabs/arctineos:latest \
+      --target-imgref ghcr.io/arctinelabs/arctineos:latest
+```
 
 # Acknowledgements/Licensing
 ArctineOS itself is licensed under the GPLv3-or-later, the license is found at the root of the repository in a file named `LICENSE`
