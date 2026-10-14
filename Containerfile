@@ -48,19 +48,19 @@ USER root
 RUN pacman -U --noconfirm ./milanium*.pkg.tar.zst
 
 RUN --mount=type=tmpfs,dst=/tmp --mount=type=tmpfs,dst=/root \
---mount=type=bind,from=ctx,source=/,target=/ctx \
-/ctx/scripts/initramfs.sh
+    --mount=type=bind,from=ctx,source=/,target=/ctx \
+    /ctx/scripts/initramfs.sh
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd" && \
-/ctx/scripts/bootc-rootfs.sh
+    sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd" && \
+    /ctx/scripts/bootc-rootfs.sh
 
 ARG CODENAME
 ARG MAJOR_VERSION
 
 RUN echo "IMAGE_VERSION=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
-echo "VERSION_ID=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
-echo "CODENAME=${CODENAME}" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
+    echo "VERSION_ID=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
+    echo "CODENAME=${CODENAME}" >> /Arctine/Filesystem/Replace/usr/lib/os-release
 
 RUN source /Arctine/Filesystem/Replace/usr/lib/os-release && \
     sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=\"ArctineOS ${VERSION_ID} ${CODENAME}\"|" /Arctine/Filesystem/Replace/usr/lib/os-release
