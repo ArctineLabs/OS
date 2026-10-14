@@ -19,7 +19,7 @@
 arclimod_Name="PM Module"
 arclimod_Author="Arctine Laboratories"
 arclimod_Version=2.0
-arclimod_Desc="The PM Module takes input and automatically detects the package manager to install it with. Supports pacman, Flatpak and ArCLI modules."
+arclimod_Desc="The PM Module takes input and automatically detects the package manager to install it with. Supports Homebrew, Flatpak and ArCLI modules."
 arclimod_ShortDesc="Install packages and modules automatically, upgrade the system."
 arclimod_Year="2026"
 
@@ -73,13 +73,13 @@ pm.add() {
     pm.backenddetector "${@:2}"
     pm.argumentassembly
     case "$Backend" in
-        localpacman)
-            sudo pacman -U "${BackendArgs[@]}" "${@:2}"
+        localbrew)
+            brew install "${BackendArgs[@]}" "${@:2}"
         ;;
-        pacman)
+        brew)
             # shellcheck disable=SC2046
             # shellcheck disable=SC2068
-            sudo pacman -S ${BackendArgs[@]} $(pacman -Ssq "$2" | gum filter --no-limit --select-if-one | xargs)
+            brew install "${BackendArgs[@]}" $(brew search "$2" | xargs -n 1 | gum filter --no-limit --select-if-one | xargs)
         ;;
         flatpak|flatpakfile)
             # shellcheck disable=SC2068
@@ -99,10 +99,10 @@ pm.subtract() {
     pm.backenddetector "${@:2}"
     pm.argumentassembly
     case "$Backend" in
-        localpacman|pacman)
+        localbrew|brew)
             # shellcheck disable=SC2046
             # shellcheck disable=SC2068
-            sudo pacman -R ${BackendArgs[@]} $(pacman -Qsq "$2" | gum filter --no-limit --select-if-one | xargs)
+            brew uninstall ${BackendArgs[@]} $(brew list | grep "$2" | gum filter --no-limit --select-if-one | xargs)
         ;;
         flatpak|flatpakfile)
             # shellcheck disable=SC2068
@@ -144,31 +144,16 @@ pm.arclimod() {
             fi
         ;;
         -*)
-            echo "[i] Checking ownership..."
-            if pacman -Qoq "$2"; then
-                ownerPackage=$(pacman -Qoq "$2")
-                read -rp "[?] $ownerPackage via pacman owns module $2. Remove $ownerPackage? [Y/n] " confirm
-                case "$confirm" in
-                    Y|y|yes|Yes|YES)
-                        sudo pacman -R "$ownerPackage" || (echo "[!] Failed." && exit 1)
-                    ;;
-                    *)
-                        echo "[i] Aborted."
-                        return 1
-                    ;;
-                esac
-            else
-                read -rp "[?] Really remove ArCLI module $2? [Y/n] " confirm
-                case "$confirm" in
-                    Y|y|yes|Yes|YES)
-                        sudo rm "$ArCLI_DIR"/Modules/"$2" -v || (echo "[!] Failed." && exit 1)
-                    ;;
-                    *)
-                        echo "[i] Aborted."
-                        return 1
-                    ;;
-                esac
-            fi
+            read -rp "[?] Really remove ArCLI module $2? [Y/n] " confirm
+            case "$confirm" in
+                Y|y|yes|Yes|YES)
+                    sudo rm "$ArCLI_DIR"/Modules/"$2" -v || (echo "[!] Failed." && exit 1)
+                ;;
+                *)
+                    echo "[i] Aborted."
+                    return 1
+                ;;
+            esac
         ;;
         *)
             echo "[!] Unrecognised option for pm.arclimod: $1"
@@ -184,12 +169,12 @@ pm.backenddetector() {
     elif [[ -z $Backend ]]; then
         # If file
         if [[ -f $1 ]]; then
-            # If localpacman
-            if echo "$1" | grep ".pkg.tar.zst$"; then
-                GuessBackend=localpacman 
+            # If localbrew
+            if echo "$1" | grep ".rb$"; then
+                GuessBackend=localbrew
                 pm.backenddetector.question && return 0
             else
-                echo "[W] Local-pacman guess incorrect"
+                echo "[W] Local brew guess incorrect"
             fi
 
             # If flatpakref
@@ -210,8 +195,8 @@ pm.backenddetector() {
         fi
 
         # If not a file
-        if pacman -Ssq "$1" | grep "$1">/dev/null; then
-            GuessBackend=pacman 
+        if brew search "$1" | xargs -n 1 | grep "$1">/dev/null; then
+            GuessBackend=brew 
             if pm.backenddetector.question; then 
                 return 0
             else
@@ -228,7 +213,7 @@ pm.backenddetector() {
                 esac
             fi
         else
-            read -rp "[W] pacman guess incorrect. Trying flatpak next, OK? [Y/n] " confirm
+            read -rp "[W] homebrew guess incorrect. Trying flatpak next, OK? [Y/n] " confirm
             case "$confirm" in
                 Y|y|yes|Yes|YES)
                     Backend=flatpak
@@ -267,13 +252,15 @@ pm.backenddetector.question() {
 
 pm.argumentassembly() {
     case "$Backend" in
-        pacman|localpacman)
-            [[ $Args == *y* ]] && BackendArgs+=(--noconfirm)
+        localbrew|brew)
+            [[ $Args == *y* ]] && BackendArgs+=(--yes)
+            [[ $Args == *v* ]] && BackendArgs+=(--verbose)
             echo "[i] Assembled pm arguments into $Backend ones: ${BackendArgs[*]}"
         ;;
 
         flatpak|flatpakfile)
             [[ $Args == *y* ]] && BackendArgs+=(--assumeyes)
+            [[ $Args == *v* ]] && BackendArgs+=(--verbose)
             echo "[i] Assembled pm arguments into $Backend ones: ${BackendArgs[*]}"
         ;;
     esac

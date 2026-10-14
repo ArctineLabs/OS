@@ -26,6 +26,7 @@ dhclient
 dhcpcd
 diffutils
 distrobox
+distroshelf
 dmidecode
 dmraid
 dnsmasq
@@ -142,6 +143,7 @@ nano
 nautilus
 nbd
 ndisc6
+neovim
 networkmanager
 nfs-utils
 nilfs-utils
@@ -188,8 +190,6 @@ showtime
 simple-scan
 skopeo
 smartmontools
-snap-pac
-snapper
 snapshot
 sof-firmware
 squashfs-tools
@@ -202,6 +202,7 @@ tecla
 terminus-font
 testdisk
 tmux
+toolbox
 tpm2-tools
 tpm2-tss
 ttf-droid

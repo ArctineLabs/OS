@@ -10,3 +10,4 @@ SUPPORT_URL="https://github.com/ArctineLabs/OS/discussions"
 BUG_REPORT_URL="https://github.com/ArctineLabs/OS/issues"
 PRIVACY_POLICY_URL="https://terms.archlinux.org/docs/privacy-policy/"
 LOGO=archlinux-logo
+DEFAULT_HOSTNAME=arctine
