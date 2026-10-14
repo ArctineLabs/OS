@@ -59,7 +59,7 @@ ARG CODENAME
 ARG MAJOR_VERSION
 
 RUN echo "IMAGE_VERSION=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
-echo "VERSION_ID=${date +%y.%m}" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
+echo "VERSION_ID=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
 echo "CODENAME=${CODENAME}" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
 
 RUN source /Arctine/Filesystem/Replace/usr/lib/os-release && \
