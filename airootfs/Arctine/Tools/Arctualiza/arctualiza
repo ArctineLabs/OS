@@ -8,8 +8,8 @@ main() {
         FUNC2=$(declare -f error)
         sudo -A bash -c "$FUNC; $FUNC2; upgrade"
     else
-        if [[ $GUI_OPTION == "View commit history" ]]; then
-            xdg-open https://github.com/ArctineLabs/OS/commits/main/
+        if [[ $GUI_OPTION == "View release history" ]]; then
+            xdg-open https://github.com/ArctineLabs/OS/releases
         else
             exit 1
         fi
