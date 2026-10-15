@@ -58,7 +58,7 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
 ARG CODENAME
 ARG MAJOR_VERSION
 
-RUN echo "IMAGE_VERSION=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
+RUN echo -e "\nIMAGE_VERSION=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
     echo "VERSION_ID=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/lib/os-release && \
     echo "CODENAME=${CODENAME}" >> /Arctine/Filesystem/Replace/usr/lib/os-release
 
