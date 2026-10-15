@@ -82,7 +82,7 @@ RUN echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel && \
     visudo -c
 
 RUN chmod 644 /etc/resolv.conf
-RUN chmod 644 /usr/share/gnome-background-properties/custom-wallpapers.xml
+RUN chmod 644 /usr/share/gnome-background-properties/spookymonth.xml
 
 
 RUN chmod 4755 /usr/bin/newgidmap && \
