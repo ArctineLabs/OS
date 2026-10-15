@@ -21,6 +21,42 @@
 				background-image: url(assets/images/spookymonth-bg-d.webp);
 			}
 		}
+
+		.window {
+            background-color: #f9f5d7d8;
+            color: #282828
+        }
+
+        button,
+        .button {
+            background-color: #282828;
+            color: #f9f5d7;
+        }
+
+        button:hover,
+        .button:hover {
+            background-color: #af3a03;
+            color: #f9f5d7;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .window {
+                background-color: #1d2021d8;
+                color: #fbf1c7
+            }
+
+            button,
+            .button {
+                background-color: #fbf1c7;
+                color: #1d2021;
+            }
+
+            button:hover,
+            .button:hover {
+                background-color: #fe8019;
+                color: #1d2021;
+            }
+        }
 	</style>
 </head>
 
@@ -51,6 +87,10 @@
 
 		<h3>homebrew..?</h3>
 		<p><a href="https://brew.sh/">homebrew</a> is a package manager that can install command-line tools without modifying your system. with +10K formulae and +6K casks (+16K packages), it offers a big range of tools to install</p>
+
+		<h3>tools from many distros</h3>
+		<p>using Distrobox and Toolbox, you can install packages from multiple distros (like Arch, Debian, Linux Mint, Ubuntu, Fedora, Void Linux, Alpine Linux etc.) without modifying your system.</p>
+		<p>it all runs in containers using podman!</p>
 		<hr>
 		<center><p>(&#8579;) <a href="https://arctine.rootsource.cc">Arctine Laboratories 2022-2026</a></p></center>
 	</div>
