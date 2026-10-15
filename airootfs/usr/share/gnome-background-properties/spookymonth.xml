@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+    <wallpaper deleted="false">
+        <name>Spookymonth</name>
+        <filename>/usr/share/backgrounds/ArctineOS/futurecity_light.webp</filename>
+        <filename-dark>/usr/share/backgrounds/fedora-workstation/futurecity_dark.webp</filename-dark>
+        <options>zoom</options>
+        <author>Arctine Laboratories</author>
+        <email>arctine@rootsource.cc</email>
+        <license>CC-BY 4.0</license>
+    </wallpaper>
+</wallpapers>
