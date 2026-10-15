@@ -10,17 +10,33 @@
 	<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
 	<meta charset="UTF-8">
+
+	<style>
+		.desk {
+			background-image: url(assets/images/spookymonth-bg-l.webp);
+		}
+
+		@media (prefers-color-scheme: dark) { 
+			.desk {
+				background-image: url(assets/images/spookymonth-bg-d.webp);
+			}
+		}
+	</style>
 </head>
 
-<body style="background-image: url('https://gitlab.gnome.org/GNOME/gnome-backgrounds/-/raw/main/backgrounds/map-d.svg');" class="desk">
+<body class="desk">
     <div class="window">
         <h1>ArctineOS</h1>
         <p>simple, opinionated and easy to use immutable distro.</p>
         <a class="button" href="https://github.com/ArctineLabs/OS">view repo</a>
-        <a class="button" href="https://github.com/ArctineLabs/OS/actions/runs/38091085428/artifacts/11684316349">download artifact (x64)</a>
+        <a class="button" href="https://github.com/ArctineLabs/OS/actions/runs/38641958358/artifacts/11931580403">download artifact (x64)</a>
 		<br>
-		<small style="overflow-wrap: break-word;">digest: sha256:309f293135e1faaf8ea239e0eab359fa55d64747276ec8936c9ffbd46514a31f</small>
+		<small style="overflow-wrap: break-word;">digest: sha256:52ae8201c28b0388fff154b15b69f604844e70eb349724941a028bf64ba62d3c</small>
 		<hr>
+		<div class="notice">
+			<p>Latest release: ArctineOS 26.10.14 Spookymonth</p>	
+        	<a class="button" style="display: block; width: 100%; box-sizing: border-box;" href="https://github.com/ArctineLabs/OS/releases/tag/v26.10.14">view changelog & info</a>
+		</div>
 		<h2>what is ArctineOS?</h2>
 		<p>an immutable arch-based distro designed for simplicity and ease of use, with sane defaults.</p>
 		<p>it is made to be familiar for newcomers wanting to use an arch-based OS, and is designed to be a distro where not a lot of maintenance is required.</p>
