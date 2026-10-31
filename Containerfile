@@ -73,6 +73,9 @@ RUN echo 'd /var/nix 0755 root root - -' > /usr/lib/tmpfiles.d/nix-storage.conf
 # Invoke filesystem file replacements
 RUN /Arctine/Scripts/hookhelper filesystem
 
+# Generate initramfs
+RUN dracut --force "$(find /usr/lib/modules -maxdepth 1 -type d | grep -v -E "*.img" | tail -n 1)/initramfs.img"
+
 # Enable the nix daemon and mount
 RUN systemctl enable nix.mount nix-daemon.service
 
@@ -102,8 +105,9 @@ RUN chmod 644 /usr/share/gnome-background-properties/kariya.xml
 RUN chmod 4755 /usr/bin/newgidmap && \
     chmod 4755 /usr/bin/newuidmap
 
-# Hopes and prayers to end GSConnect's complaints
-RUN ln -sfn /usr/share/glib-2.0 /usr/local/share/glib-2.0
+# Hopes and prayers to end GSConnect's complaints, and other mountfooleries.
+RUN printf 'd /var/usrlocal/share 0755 root root -\nL /var/usrlocal/share/glib-2.0 - - - - /usr/share/glib-2.0\n' \
+    > /usr/lib/tmpfiles.d/arctine-glib.conf
 
 # Locale generation
 RUN locale-gen
