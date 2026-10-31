@@ -106,6 +106,13 @@ const _KeyBindings = class _KeyBindings extends GObject.Object {
       (dp) => this.emit("untile-window", dp)
     );
     Main.wm.addKeybinding(
+      Settings.SETTING_UNTILE_ALL_WINDOWS,
+      extensionSettings,
+      Meta.KeyBindingFlags.NONE,
+      Shell.ActionMode.NORMAL,
+      (dp) => this.emit("untile-all-windows", dp)
+    );
+    Main.wm.addKeybinding(
       Settings.SETTING_MOVE_WINDOW_CENTER,
       extensionSettings,
       Meta.KeyBindingFlags.NONE,
@@ -292,6 +299,7 @@ const _KeyBindings = class _KeyBindings extends GObject.Object {
     Main.wm.removeKeybinding(Settings.SETTING_SPAN_WINDOW_DOWN);
     Main.wm.removeKeybinding(Settings.SETTING_SPAN_WINDOW_ALL_TILES);
     Main.wm.removeKeybinding(Settings.SETTING_UNTILE_WINDOW);
+    Main.wm.removeKeybinding(Settings.SETTING_UNTILE_ALL_WINDOWS);
     Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_CENTER);
     Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_UP);
     Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_DOWN);
@@ -343,6 +351,10 @@ registerGObjectClass(_KeyBindings, {
       // Meta.Display
     },
     "untile-window": {
+      param_types: [Meta.Display.$gtype]
+      // Meta.Display
+    },
+    "untile-all-windows": {
       param_types: [Meta.Display.$gtype]
       // Meta.Display
     },

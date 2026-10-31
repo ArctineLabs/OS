@@ -6,6 +6,7 @@ var ActivationKey = /* @__PURE__ */ ((ActivationKey2) => {
   ActivationKey2[ActivationKey2["CTRL"] = 0] = "CTRL";
   ActivationKey2[ActivationKey2["ALT"] = 1] = "ALT";
   ActivationKey2[ActivationKey2["SUPER"] = 2] = "SUPER";
+  ActivationKey2[ActivationKey2["RIGHT_BUTTON"] = 3] = "RIGHT_BUTTON";
   return ActivationKey2;
 })(ActivationKey || {});
 var EdgeTilingMode = /* @__PURE__ */ ((EdgeTilingMode2) => {
@@ -86,6 +87,7 @@ class Settings {
   static KEY_ENABLE_MOVE_KEYBINDINGS = "enable-move-keybindings";
   static KEY_ENABLE_AUTO_TILING = "enable-autotiling";
   static KEY_RAISE_TOGETHER = "raise-together";
+  static KEY_RAISE_TOGETHER_CURRENT_MONITOR_ONLY = "raise-together-current-monitor-only";
   static KEY_ACTIVE_SCREEN_EDGES = "active-screen-edges";
   static KEY_TOP_EDGE_MAXIMIZE = "top-edge-maximize";
   static KEY_OVERRIDE_WINDOW_MENU = "override-window-menu";
@@ -106,6 +108,7 @@ class Settings {
   static KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS = "enable-snap-assistant-windows-suggestions";
   static KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS = "enable-screen-edges-windows-suggestions";
   static KEY_EDGE_TILING_MODE = "edge-tiling-mode";
+  static KEY_SYNC_LAYOUT_ACROSS_WORKSPACES = "sync-layout-across-workspaces";
   static SETTING_MOVE_WINDOW_RIGHT = "move-window-right";
   static SETTING_MOVE_WINDOW_LEFT = "move-window-left";
   static SETTING_MOVE_WINDOW_UP = "move-window-up";
@@ -116,6 +119,7 @@ class Settings {
   static SETTING_SPAN_WINDOW_DOWN = "span-window-down";
   static SETTING_SPAN_WINDOW_ALL_TILES = "span-window-all-tiles";
   static SETTING_UNTILE_WINDOW = "untile-window";
+  static SETTING_UNTILE_ALL_WINDOWS = "untile-all-windows";
   static SETTING_MOVE_WINDOW_CENTER = "move-window-center";
   static SETTING_FOCUS_WINDOW_RIGHT = "focus-window-right";
   static SETTING_FOCUS_WINDOW_LEFT = "focus-window-left";
@@ -324,6 +328,14 @@ class Settings {
     set_boolean(Settings.KEY_RAISE_TOGETHER, val);
   }
 
+  static get RAISE_TOGETHER_CURRENT_MONITOR_ONLY() {
+    return get_boolean(Settings.KEY_RAISE_TOGETHER_CURRENT_MONITOR_ONLY);
+  }
+
+  static set RAISE_TOGETHER_CURRENT_MONITOR_ONLY(val) {
+    set_boolean(Settings.KEY_RAISE_TOGETHER_CURRENT_MONITOR_ONLY, val);
+  }
+
   static get ACTIVE_SCREEN_EDGES() {
     return get_boolean(Settings.KEY_ACTIVE_SCREEN_EDGES);
   }
@@ -478,6 +490,14 @@ class Settings {
 
   static set EDGE_TILING_MODE(val) {
     set_string(Settings.KEY_EDGE_TILING_MODE, val);
+  }
+
+  static get SYNC_LAYOUT_ACROSS_WORKSPACES() {
+    return get_boolean(Settings.KEY_SYNC_LAYOUT_ACROSS_WORKSPACES);
+  }
+
+  static set SYNC_LAYOUT_ACROSS_WORKSPACES(val) {
+    set_boolean(Settings.KEY_SYNC_LAYOUT_ACROSS_WORKSPACES, val);
   }
 
   static get_inner_gaps(scaleFactor = 1) {

@@ -42,6 +42,7 @@ const _MultipleWindowsIcon = class _MultipleWindowsIcon extends LayoutWidget {
       text: _("Tiled windows")
     });
     this._window = new MetaWindowGroup(params.windows);
+    this.connect("destroy", () => this._window.destroy());
     let rightMostPercentage = 0;
     params.tiles.forEach((t) => {
       if (t.x + t.width > rightMostPercentage)

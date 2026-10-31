@@ -6,6 +6,7 @@ import St from 'gi://St';
 
 import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { ActiveState } from '../../common/constants.js';
 import { enumParamSpec, flagsParamSpec, registerClass } from '../../common/gjs.js';
 import { Icon } from '../../common/icons.js';
@@ -13,20 +14,6 @@ import { BackgroundSize } from '../../common/settings.js';
 import { tryGetLinkImage, tryGetMetadata } from '../../misc/link.js';
 import { ImagePreview } from '../components/contentPreview.js';
 import { ClipboardItem } from './clipboardItem.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 const SPACING = 3;
 const IMAGE_SPACING = 6;

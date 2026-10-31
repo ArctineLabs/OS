@@ -5,6 +5,7 @@ import Gio from 'gi://Gio';
 
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import {
 	ActionOutput,
 	findActionById,
@@ -25,20 +26,6 @@ import { registerClass } from '../../common/gjs.js';
 import { trim } from './label.js';
 import { QrCodeDialog } from './qrCodeDialog.js';
 import { ShortcutLabel } from './shortcutLabel.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 Gio._promisify(Gio.Subprocess.prototype, 'wait_async');
 Gio._promisify(Gio.Subprocess.prototype, 'communicate_utf8_async');

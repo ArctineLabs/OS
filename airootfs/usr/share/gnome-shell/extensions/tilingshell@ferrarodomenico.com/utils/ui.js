@@ -1,5 +1,6 @@
-import { St, Meta, Mtk, Clutter } from "../gi/ext.js";
+import { St, Meta, Mtk, Clutter, GLib } from "../gi/ext.js";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import * as Config from "resource:///org/gnome/shell/misc/config.js";
 const getMonitors = () => Main.layoutManager.monitors;
 const isPointInsideRect = (point, rect) => {
   return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
@@ -47,6 +48,14 @@ const buildTileGaps = (tilePos, innerGaps, outerGaps, container, scalingFactor =
     isBottom,
     isLeft
   };
+};
+const isFractionalScalingEnabled = (mutterSettings) => {
+  const GNOME_VERSION_MAJOR = Number(Config.PACKAGE_VERSION.split(".")[0]);
+  const isWayland = Meta.is_wayland_compositor ? Meta.is_wayland_compositor() : GLib.getenv("XDG_SESSION_TYPE") === "wayland";
+  if (isWayland && GNOME_VERSION_MAJOR >= 49) return true;
+  return mutterSettings.get_strv("experimental-features").find(
+    (feat) => feat === "scale-monitor-framebuffer" || feat === "x11-randr-fractional-scaling"
+  ) !== void 0;
 };
 const getMonitorScalingFactor = (monitorIndex) => {
   const scalingFactor = St.ThemeContext.get_for_stage(
@@ -139,6 +148,7 @@ export {
   getScalingFactorSupportString,
   getWindows,
   getWindowsOfMonitor,
+  isFractionalScalingEnabled,
   isPointInsideRect,
   isTileOnContainerBorder,
   squaredEuclideanDistance

@@ -5,25 +5,12 @@ import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { Color } from '../common/color.js';
 import { ItemType, getImagesPath } from '../common/constants.js';
 import { registerClass } from '../common/gjs.js';
 import { ClipboardEntry, FileOperation } from '../database/database.js';
 import { Keyboard } from './keyboard.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 Gio._promisify(Gio.File.prototype, 'load_contents_async');
 Gio._promisify(Gio.File.prototype, 'replace_contents_async');
@@ -55,9 +42,23 @@ function contentChecksum(content) {
 	}
 }
 
+const ClipboardManagerSignals = {
+	clipboard: {
+		param_types: [ClipboardEntry.$gtype],
+	},
+	text: {
+		param_types: [GObject.TYPE_STRING],
+	},
+	image: {
+		param_types: [GObject.TYPE_JSOBJECT, GObject.TYPE_INT, GObject.TYPE_INT],
+	},
+};
 let ClipboardManager = class ClipboardManager extends GObject.Object {
 	ext;
 	tracker;
+	textDecoder = new TextDecoder();
+	textEncoder = new TextEncoder();
+	graphemeSegmenter = new Intl.Segmenter();
 	selection;
 	clipboard;
 	keyboard;
@@ -71,12 +72,15 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		this.tracker = tracker;
 		this.selection = global.display.get_selection();
 		this.clipboard = St.Clipboard.get_default();
-		this.keyboard = new Keyboard();
 		this.signalId = this.selection.connect('owner-changed', this.ownerChanged.bind(this));
 	}
 
 	destroy() {
-		this.keyboard.destroy();
+		this.textDecoder = undefined;
+		this.textEncoder = undefined;
+		this.graphemeSegmenter = undefined;
+		this.keyboard?.destroy();
+		this.keyboard = undefined;
 		if (this.signalId >= 0) this.selection.disconnect(this.signalId);
 		if (this.pasteSignalId >= 0) GLib.source_remove(this.pasteSignalId);
 		this.signalId = -1;
@@ -106,7 +110,7 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		// File
 		if (content.type === ContentType.File) {
 			const s = `${FileOperation.Copy}\n${content.paths.join('\n')}`;
-			const bytes = new TextEncoder().encode(s);
+			const bytes = this.textEncoder.encode(s);
 			this.clipboard.set_content(St.ClipboardType.CLIPBOARD, MimeTypes.File[0], bytes);
 			return;
 		}
@@ -116,6 +120,8 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		this.copyContent(content);
 		if (this.pasteSignalId >= 0) GLib.source_remove(this.pasteSignalId);
 		this.pasteSignalId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+			this.keyboard ??= new Keyboard();
+
 			// https://github.com/Tudmotu/gnome-shell-extension-clipboard-indicator/blob/89c57703641a9d5d15f899f6e780174641911d95/extension.js#L1094
 			if (this.keyboard.purpose === Clutter.InputContentPurpose.TERMINAL) {
 				this.keyboard.press(Clutter.KEY_Control_L);
@@ -192,9 +198,8 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		}
 	}
 
-	shouldSave(selectionSource) {
+	shouldSave(mimeTypes) {
 		// Mime Type
-		const mimeTypes = selectionSource.get_mimetypes();
 		if (MimeTypes.Sensitive.some((value) => mimeTypes.includes(value))) {
 			return false;
 		}
@@ -203,7 +208,7 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		const window = global.display.focus_window;
 		if (window) {
 			const exclusions = this.ext.settings.get_strv('wmclass-exclusions');
-			if (exclusions.includes(window.wm_class)) return false;
+			if (window.wm_class && exclusions.includes(window.wm_class)) return false;
 		}
 		return !this.ext.settings.get_boolean('incognito');
 	}
@@ -212,7 +217,8 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		try {
 			if (selectionSource === null) return;
 			if (selectionType !== Meta.SelectionType.SELECTION_CLIPBOARD) return;
-			const content = await this.getContent(selectionSource);
+			const mimeTypes = selectionSource.get_mimetypes();
+			const content = await this.getContent(selectionSource, mimeTypes);
 			if (!content) return;
 			const checksum = contentChecksum(content);
 			if (!checksum) return;
@@ -235,7 +241,7 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 			// Check if history should be saved after setting the previous clipboard item.
 			// This ensures that content copied in incognito mode is not saved to history
 			// after copying an item after exiting incognito mode.
-			if (!this.shouldSave(selectionSource)) return;
+			if (!this.shouldSave(mimeTypes)) return;
 			const res = await this.convertContent(content);
 			if (!res) return;
 			const [type, text, metadata] = res;
@@ -248,7 +254,7 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		}
 	}
 
-	async getContent(selectionSource) {
+	async getContent(selectionSource, mimeTypes) {
 		async function getBytes(mimeType) {
 			const source = await selectionSource.read_async(mimeType, null);
 			const out = Gio.MemoryOutputStream.new_resizable();
@@ -260,8 +266,6 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 			);
 			return out.steal_as_bytes().toArray();
 		}
-
-		const mimeTypes = selectionSource.get_mimetypes();
 
 		// Image
 		const imageMimeType = MimeTypes.Image.find((value) => mimeTypes.includes(value));
@@ -280,7 +284,7 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		const fileMimeType = MimeTypes.File.find((value) => mimeTypes.includes(value));
 		if (fileMimeType) {
 			const bytes = await getBytes(fileMimeType);
-			const text = new TextDecoder().decode(bytes).trim();
+			const text = this.textDecoder.decode(bytes).trim();
 			if (text) {
 				const files = text
 					.split('\n')
@@ -301,7 +305,7 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		const textMimeType = MimeTypes.Text.find((value) => mimeTypes.includes(value));
 		if (textMimeType) {
 			const bytes = await getBytes(textMimeType);
-			const text = new TextDecoder().decode(bytes);
+			const text = this.textDecoder.decode(bytes);
 			if (text && text.trim()) {
 				return { type: ContentType.Text, text };
 			} else {
@@ -325,10 +329,8 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 			}
 
 			// Character
-			const iterator = new Intl.Segmenter().segment(trimmed)[Symbol.iterator]();
 			const maxCharacters = this.ext.settings.get_child('character-item').get_int('max-characters');
-			for (let i = 0; i < maxCharacters; i++) iterator.next();
-			if (!iterator.next().value) {
+			if (!this.hasMoreGraphemes(trimmed, maxCharacters)) {
 				return [ItemType.Character, content.text, null];
 			}
 
@@ -387,21 +389,17 @@ let ClipboardManager = class ClipboardManager extends GObject.Object {
 		}
 		return null;
 	}
+
+	hasMoreGraphemes(text, max) {
+		const iterator = this.graphemeSegmenter.segment(text)[Symbol.iterator]();
+		for (let i = 0; i < max; i++) iterator.next();
+		return iterator.next().value !== undefined;
+	}
 };
 ClipboardManager = __decorate(
 	[
 		registerClass({
-			Signals: {
-				clipboard: {
-					param_types: [ClipboardEntry.$gtype],
-				},
-				text: {
-					param_types: [GObject.TYPE_STRING],
-				},
-				image: {
-					param_types: [GObject.TYPE_JSOBJECT, GObject.TYPE_INT, GObject.TYPE_INT],
-				},
-			},
+			Signals: ClipboardManagerSignals,
 		}),
 	],
 	ClipboardManager,

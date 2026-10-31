@@ -6,26 +6,13 @@ import Gtk from 'gi://Gtk';
 
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { getDataPath, getDefaultDatabaseFile } from '../../common/constants.js';
 import { registerClass } from '../../common/gjs.js';
 import { Icon } from '../../common/icons.js';
 import { DatabaseBackend, bind_enum } from '../../common/settings.js';
 import { GdaDialog, checkGda } from '../dependencies/dependencies.js';
 import { makeResettable } from '../utils.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 Gio._promisify(Gtk.FileDialog.prototype, 'open', 'open_finish');
 let DatabaseBackendItem = class DatabaseBackendItem extends GObject.Object {
@@ -161,7 +148,7 @@ let HistorySettings = class HistorySettings extends Adw.PreferencesGroup {
 		if (this._databaseLocation.subtitle === this._defaultDatabaseLocation) {
 			return '';
 		} else {
-			return this._databaseLocation.subtitle;
+			return this._databaseLocation.subtitle ?? '';
 		}
 	}
 

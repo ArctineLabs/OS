@@ -1,25 +1,14 @@
 import Adw from 'gi://Adw';
 import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { registerClass } from '../../common/gjs.js';
+import { makeResettable } from '../utils.js';
 import { ShortcutRow } from './shortcutRow.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 const ShortcutLabel = ('ShortcutLabel' in Gtk && !('ShortcutLabel' in Adw) ? Gtk : Adw).ShortcutLabel;
 let ScrollShortcutRow = class ScrollShortcutRow extends Adw.ActionRow {
@@ -56,11 +45,15 @@ ScrollShortcutRow = __decorate(
 	ScrollShortcutRow,
 );
 let SearchShortcuts = class SearchShortcuts extends Adw.PreferencesGroup {
-	constructor() {
+	constructor(prefs) {
 		super({ title: _('Search') });
-		this.add(new ShortcutRow(_('Toggle Pinned Search'), '<Alt>'));
+		const togglePinnedSearch = new ShortcutRow(_('Toggle Pinned Search'), '', true);
+		this.add(togglePinnedSearch);
 		this.add(new ShortcutRow(_('Clear Item Tag/Type'), 'Back'));
 		this.add(new ShortcutRow(_('Activate First Item'), 'Return'));
+		const settings = prefs.getSettings();
+		settings.bind('toggle-pinned-search-shortcut', togglePinnedSearch, 'shortcuts', Gio.SettingsBindFlags.DEFAULT);
+		makeResettable(togglePinnedSearch, settings, 'toggle-pinned-search-shortcut');
 	}
 };
 SearchShortcuts = __decorate([registerClass()], SearchShortcuts);

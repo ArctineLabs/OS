@@ -7,28 +7,17 @@ import * as BoxPointer from 'resource:///org/gnome/shell/ui/boxpointer.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { ItemType, ItemTypes, Tags } from '../common/constants.js';
 import { enumParamSpec, registerClass } from '../common/gjs.js';
 import { Icon, loadIcon } from '../common/icons.js';
+import { ButtonMask } from '../misc/compatibility.js';
+import { Shortcut } from '../misc/shortcuts.js';
 import { TagsItem } from './components/tagsItem.js';
 
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 var SearchQuery_1;
 
-function localeContains(text, query) {
-	const collator = new Intl.Collator(undefined, { sensitivity: 'base' });
+function localeContains(collator, text, query) {
 	for (let offset = 0; offset <= text.length - query.length; offset++) {
 		const comparison = collator.compare(text.substring(offset, offset + query.length), query);
 		if (comparison === 0) return true;
@@ -51,8 +40,9 @@ let SearchQuery = (SearchQuery_1 = class SearchQuery extends GObject.Object {
 	tag;
 	excludeTagged;
 	type;
+	collator;
 
-	constructor(change, query, pinned, excludePinned, tag, excludeTagged, type) {
+	constructor(change, query, pinned, excludePinned, tag, excludeTagged, type, collator) {
 		super();
 		this.change = change;
 		this.query = query;
@@ -61,6 +51,7 @@ let SearchQuery = (SearchQuery_1 = class SearchQuery extends GObject.Object {
 		this.tag = tag;
 		this.excludeTagged = excludeTagged;
 		this.type = type;
+		this.collator = collator;
 	}
 
 	matchesPinned(pinned) {
@@ -82,17 +73,16 @@ let SearchQuery = (SearchQuery_1 = class SearchQuery extends GObject.Object {
 	matchesQuery(...text) {
 		if (this.query.length === 0) return true;
 		if (text.length === 0) return false;
-		return text.some((s) => localeContains(s, this.query));
+		return text.some((s) => localeContains(this.collator, s, this.query));
 	}
 
 	matchesEntry(state, entry, ...text) {
 		if (this.change === SearchChange.Same) return state;
 		if (this.change === SearchChange.LessStrict && state) return true;
 		if (this.change === SearchChange.MoreStrict && !state) return false;
-
-		// Include entry title in search texts
-		const searchTexts = entry.title ? [...text, entry.title] : text;
-		return this.matchesProperties(entry.pinned, entry.tag, entry.type) && this.matchesQuery(...searchTexts);
+		if (!this.matchesProperties(entry.pinned, entry.tag, entry.type)) return false;
+		if (this.matchesQuery(...text)) return true;
+		return entry.title ? this.matchesQuery(entry.title) : false;
 	}
 
 	withChange(change) {
@@ -104,6 +94,7 @@ let SearchQuery = (SearchQuery_1 = class SearchQuery extends GObject.Object {
 			this.tag,
 			this.excludeTagged,
 			this.type,
+			this.collator,
 		);
 	}
 });
@@ -264,6 +255,7 @@ class ItemPopupMenu extends PopupMenu.PopupMenu {
 
 let SearchEntry = class SearchEntry extends St.Entry {
 	ext;
+	_collator = new Intl.Collator(undefined, { sensitivity: 'base' });
 	_prevSearch = null;
 	_pinned = false;
 	_tag = null;
@@ -299,7 +291,7 @@ let SearchEntry = class SearchEntry extends St.Entry {
 		left.connect('key-press-event', (_btn, event) => this._leftKeyPressEvent(event));
 		this._itemButton = new St.Button({
 			style_class: 'search-entry-button item-button',
-			button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
+			button_mask: ButtonMask.PRIMARY | ButtonMask.MIDDLE,
 		});
 		left.add_child(this._itemButton);
 		this._itemButton.connect('clicked', (_btn, button) => {
@@ -412,15 +404,16 @@ let SearchEntry = class SearchEntry extends St.Entry {
 	get searchQuery() {
 		const excludePinned = this.ext.settings.get_boolean('exclude-pinned');
 		const excludeTagged = this.ext.settings.get_boolean('exclude-tagged');
+		const query = this.text;
 		let change;
 		if (!this._prevSearch) {
 			change = SearchChange.Different;
 		} else {
 			// Query
 			let queryChange;
-			if (this.text === this._prevSearch.query) queryChange = SearchChange.Same;
-			else if (this.text.includes(this._prevSearch.query)) queryChange = SearchChange.MoreStrict;
-			else if (this._prevSearch.query.includes(this.text)) queryChange = SearchChange.LessStrict;
+			if (query === this._prevSearch.query) queryChange = SearchChange.Same;
+			else if (query.includes(this._prevSearch.query)) queryChange = SearchChange.MoreStrict;
+			else if (this._prevSearch.query.includes(query)) queryChange = SearchChange.LessStrict;
 			else queryChange = SearchChange.Different;
 			change = queryChange;
 
@@ -463,7 +456,16 @@ let SearchEntry = class SearchEntry extends St.Entry {
 			if (typeChange !== SearchChange.Same)
 				change = change === SearchChange.Same || change === typeChange ? typeChange : SearchChange.Different;
 		}
-		return new SearchQuery(change, this.text, this.pinned, excludePinned, this.tag, excludeTagged, this.type);
+		return new SearchQuery(
+			change,
+			query,
+			this.pinned,
+			excludePinned,
+			this.tag,
+			excludeTagged,
+			this.type,
+			this._collator,
+		);
 	}
 
 	search() {
@@ -510,8 +512,10 @@ let SearchEntry = class SearchEntry extends St.Entry {
 			return Clutter.EVENT_STOP;
 		}
 
-		// Toggle pin: alt
-		if (key === Clutter.KEY_Alt_L || key === Clutter.KEY_Alt_R || key === Clutter.KEY_ISO_Level3_Shift) {
+		// Toggle pinned search
+		if (
+			this.ext.shortcutsManager?.getShortcutForKeyBinding(key, event.get_state()) === Shortcut.TogglePinnedSearch
+		) {
 			this.pinned = !this.pinned;
 			return Clutter.EVENT_STOP;
 		}
@@ -587,6 +591,7 @@ let SearchEntry = class SearchEntry extends St.Entry {
 	destroy() {
 		this.ext.settings.disconnectObject(this);
 		this._menu.destroy();
+		this._collator = undefined;
 		super.destroy();
 	}
 };

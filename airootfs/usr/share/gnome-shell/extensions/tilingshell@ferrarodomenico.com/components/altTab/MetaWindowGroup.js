@@ -1,5 +1,6 @@
 class MetaWindowGroup {
   _windows;
+  _signalIds;
   _unmanagedCounter;
   // count how many windows are unmanaged
   _unmanagedEventHandler;
@@ -11,7 +12,7 @@ class MetaWindowGroup {
     this._windows = windows;
     this._unmanagedCounter = 0;
     this._unmanagedEventHandler = null;
-    this._windows.forEach(
+    this._signalIds = this._windows.map(
       (win) => win.connect("unmanaged", () => {
         this._unmanagedCounter++;
         if (this._unmanagedEventHandler && this._unmanagedCounter === this._windows.length)
@@ -57,6 +58,15 @@ class MetaWindowGroup {
 
   onAllWindowsUnmanaged(fn) {
     this._unmanagedEventHandler = fn;
+  }
+
+  destroy() {
+    this._windows.forEach((win, i) => {
+      if (this._signalIds[i])
+        win.disconnect(this._signalIds[i]);
+    });
+    this._signalIds = [];
+    this._unmanagedEventHandler = null;
   }
 }
 

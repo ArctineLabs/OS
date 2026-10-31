@@ -109,6 +109,7 @@ irssi
 iw
 iwd
 jfsutils
+jq
 kitty-terminfo
 ldns
 less
@@ -210,6 +211,7 @@ ttf-ibm-plex
 ttf-liberation
 ttf-roboto
 udftools
+unzip
 usb_modeswitch
 usbmuxd
 usbutils

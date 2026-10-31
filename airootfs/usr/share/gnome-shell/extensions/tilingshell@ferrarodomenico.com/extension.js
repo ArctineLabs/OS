@@ -25,6 +25,7 @@ import {
   filterUnfocusableWindows,
   getMonitors,
   getWindows,
+  isFractionalScalingEnabled,
   squaredEuclideanDistance
 } from "./utils/ui.js";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
@@ -110,7 +111,7 @@ class TilingShellExtension extends Extension {
     }
     this._validateSettings();
     TilingShellWindowManager.get();
-    this._fractionalScalingEnabled = this._isFractionalScalingEnabled(
+    this._fractionalScalingEnabled = isFractionalScalingEnabled(
       new Gio.Settings({ schema: "org.gnome.mutter" })
     );
     if (this._keybindings) this._keybindings.destroy();
@@ -184,7 +185,7 @@ class TilingShellExtension extends Extension {
       "changed::experimental-features",
       (_mutterSettings) => {
         if (!_mutterSettings) return;
-        const fractionalScalingEnabled = this._isFractionalScalingEnabled(_mutterSettings);
+        const fractionalScalingEnabled = isFractionalScalingEnabled(_mutterSettings);
         if (this._fractionalScalingEnabled === fractionalScalingEnabled)
           return;
         this._fractionalScalingEnabled = fractionalScalingEnabled;
@@ -195,7 +196,7 @@ class TilingShellExtension extends Extension {
         if (this._windowBorderManager)
           this._windowBorderManager.destroy();
         this._windowBorderManager = new WindowBorderManager(
-          this._fractionalScalingEnabled
+          !this._fractionalScalingEnabled
         );
         this._windowBorderManager.enable();
       }
@@ -229,6 +230,11 @@ class TilingShellExtension extends Extension {
         this._keybindings,
         "untile-window",
         this._onKeyboardUntileWindow.bind(this)
+      );
+      this._signals.connect(
+        this._keybindings,
+        "untile-all-windows",
+        this._onKeyboardUntileAllWindows.bind(this)
       );
       this._signals.connect(
         this._keybindings,
@@ -557,21 +563,27 @@ class TilingShellExtension extends Extension {
     monitorTilingManager.onUntileWindow(focus_window, true);
   }
 
-  _isFractionalScalingEnabled(_mutterSettings) {
-    return _mutterSettings.get_strv("experimental-features").find(
-      (feat) => feat === "scale-monitor-framebuffer" || feat === "x11-randr-fractional-scaling"
-    ) !== void 0;
+  _onKeyboardUntileAllWindows(_kb, _display) {
+    getWindows().forEach((extWin) => {
+      if (extWin && !extWin.minimized && extWin.assignedTile) {
+        if (extWin.windowType !== Meta.WindowType.NORMAL || extWin.get_wm_class() && extWin.get_wm_class() === "gjs")
+          return;
+        if (extWin.maximizedHorizontally || extWin.maximizedVertically)
+          unmaximizeWindow(extWin);
+        const monitorTilingManager = this._tilingManagers[extWin.get_monitor()];
+        if (!monitorTilingManager) return;
+        monitorTilingManager.onUntileWindow(extWin, true);
+      }
+    });
   }
 
   disable() {
+    this._signals?.disconnect();
+    this._signals = null;
     this._keybindings?.destroy();
     this._keybindings = null;
     this._indicator?.destroy();
     this._indicator = null;
-    this._tilingManagers.forEach((tm) => tm.destroy());
-    this._tilingManagers = [];
-    this._signals?.disconnect();
-    this._signals = null;
     this._resizingManager?.destroy();
     this._resizingManager = null;
     this._windowBorderManager?.destroy();

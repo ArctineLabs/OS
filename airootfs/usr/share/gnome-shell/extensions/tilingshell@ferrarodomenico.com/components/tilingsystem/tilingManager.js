@@ -27,7 +27,11 @@ import TouchPointer from "./touchPointer.js";
 import { KeyBindingsDirection } from "../../keybindings.js";
 import TilingShellWindowManager from "../../components/windowManager/tilingShellWindowManager.js";
 import TilingLayoutWithSuggestions from "../windowsSuggestions/tilingLayoutWithSuggestions.js";
-import { maximizeWindow, unmaximizeWindow } from "../../utils/gnomesupport.js";
+import {
+  getDefaultSeat,
+  maximizeWindow,
+  unmaximizeWindow
+} from "../../utils/gnomesupport.js";
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
 class SnapAssistingInfo {
@@ -59,6 +63,8 @@ class TilingManager {
   _workArea;
   _enableScaling;
   _isGrabbingWindow;
+  _rmbFilterId = 0;
+  _rmbFilterInstalled = false;
   _movingWindowTimerDuration = 15;
   _lastCursorPos = null;
   _grabStartPosition = null;
@@ -123,7 +129,6 @@ class TilingManager {
     this._snapAssist = new SnapAssist(
       Main.uiGroup,
       this._workArea,
-      this._monitor.index,
       monitorScalingFactor
     );
   }
@@ -316,7 +321,7 @@ class TilingManager {
         // if the gaps are all 0 we choose 64 instead
         tilingLayout.innerGaps.right,
         tilingLayout.innerGaps.left,
-        tilingLayout.innerGaps.right,
+        tilingLayout.innerGaps.top,
         tilingLayout.innerGaps.bottom
       );
       destination = tilingLayout.findNearestTileDirection(
@@ -367,6 +372,7 @@ class TilingManager {
     }
     this._signals.disconnect();
     this._isGrabbingWindow = false;
+    this._removeRmbFilterIfInstalled();
     this._snapAssistingInfo.update(void 0);
     this._edgeTilingManager.abortEdgeTiling();
     this._workspaceTilingLayout.forEach((tl) => tl.destroy());
@@ -412,8 +418,7 @@ class TilingManager {
           if (eventType === Clutter.EventType.MOTION) {
             const [x, y] = event.get_coords();
             TouchPointer.get().onTouchEvent(x, y);
-            const seat = Clutter.get_default_backend().get_default_seat();
-            seat.warp_pointer(x, y);
+            getDefaultSeat().warp_pointer(x, y);
           }
         }
       }
@@ -429,12 +434,73 @@ class TilingManager {
       });
     }
     this._isGrabbingWindow = true;
+    this._installRmbFilterIfNeeded();
     this._movingWindowTimerId = GLib.timeout_add(
       GLib.PRIORITY_DEFAULT_IDLE,
       this._movingWindowTimerDuration,
       this._onMovingWindow.bind(this, window, grabOp)
     );
     this._onMovingWindow(window, grabOp);
+  }
+
+  _anyActivationKeyIsRmb() {
+    return Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_BUTTON || Settings.TILING_SYSTEM_DEACTIVATION_KEY === ActivationKey.RIGHT_BUTTON || Settings.SPAN_MULTIPLE_TILES_ACTIVATION_KEY === ActivationKey.RIGHT_BUTTON;
+  }
+
+  _rmbEventFilter(event, _actor) {
+    const t = event.type();
+    if (t !== Clutter.EventType.BUTTON_PRESS && t !== Clutter.EventType.BUTTON_RELEASE) {
+      return Clutter.EVENT_PROPAGATE;
+    }
+    if (event.get_button() === Clutter.BUTTON_SECONDARY) {
+      return Clutter.EVENT_STOP;
+    }
+    return Clutter.EVENT_PROPAGATE;
+  }
+
+  _installRmbFilterIfNeeded() {
+    if (this._rmbFilterInstalled) return;
+    if (!this._anyActivationKeyIsRmb()) return;
+    const addFilter = Clutter.event_add_filter;
+    if (typeof addFilter !== "function") {
+      console.error(
+        "tilingshell: Clutter.event_add_filter unavailable; RIGHT_BUTTON activation key will not work on this version."
+      );
+      return;
+    }
+    try {
+      this._rmbFilterId = addFilter(
+        global.stage,
+        this._rmbEventFilter.bind(this)
+      );
+      this._rmbFilterInstalled = this._rmbFilterId !== 0;
+      if (!this._rmbFilterInstalled) {
+        console.error(
+          "tilingshell: Clutter.event_add_filter returned 0; RIGHT_BUTTON activation key will not work this drag."
+        );
+      }
+    } catch (e) {
+      console.error("tilingshell: failed to install RMB filter: " + e);
+      this._rmbFilterInstalled = false;
+      this._rmbFilterId = 0;
+    }
+  }
+
+  _removeRmbFilterIfInstalled() {
+    if (!this._rmbFilterInstalled || this._rmbFilterId === 0) return;
+    const removeFilter = Clutter.event_remove_filter;
+    if (typeof removeFilter !== "function") {
+      this._rmbFilterInstalled = false;
+      this._rmbFilterId = 0;
+      return;
+    }
+    try {
+      removeFilter(this._rmbFilterId);
+    } catch (e) {
+      console.error("tilingshell: failed to remove RMB filter: " + e);
+    }
+    this._rmbFilterInstalled = false;
+    this._rmbFilterId = 0;
   }
 
   _activationKeyStatus(modifier, key) {
@@ -448,10 +514,13 @@ class TilingManager {
         mask = Clutter.ModifierType.MOD1_MASK;
         break;
       case ActivationKey.SUPER:
-        mask = Clutter.ModifierType.SUPER_MASK;
+        mask = Clutter.ModifierType.MOD4_MASK;
+        break;
+      case ActivationKey.RIGHT_BUTTON:
+        mask = Clutter.ModifierType.BUTTON2_MASK;
         break;
     }
-    return (modifier & mask) === mask;
+    return (modifier & mask) !== 0;
   }
 
   _onMovingWindow(window, grabOp) {
@@ -594,6 +663,7 @@ class TilingManager {
 
   _onWindowGrabEnd(window) {
     this._isGrabbingWindow = false;
+    this._removeRmbFilterIfInstalled();
     this._grabStartPosition = null;
     this._signals.disconnect(window);
     TouchPointer.get().reset();
@@ -931,7 +1001,7 @@ class TilingManager {
     vacantTiles.sort((a, b) => a.x - b.x);
     let bestTileIndex = 0;
     let bestDistance = Math.abs(
-      0.5 - vacantTiles[bestTileIndex].x + vacantTiles[bestTileIndex].width / 2
+      0.5 - (vacantTiles[bestTileIndex].x + vacantTiles[bestTileIndex].width / 2)
     );
     for (let index = 1; index < vacantTiles.length; index++) {
       const distance = Math.abs(

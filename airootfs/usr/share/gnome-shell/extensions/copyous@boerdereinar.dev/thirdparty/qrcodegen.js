@@ -684,11 +684,8 @@ var qrcodegen;
 	// to the given buffer. Requires 0 <= len <= 31 and 0 <= val < 2^len.
 	function appendBits(val, len, bb) {
 		if (len < 0 || len > 31 || val >>> len != 0) throw new RangeError('Value out of range');
-		for (
-			let i = len - 1;
-			i >= 0;
-			i-- // Append bit by bit
-		)
+		for (let i = len - 1; i >= 0; i--)
+			// Append bit by bit
 			bb.push((val >>> i) & 1);
 	}
 
@@ -733,7 +730,7 @@ var qrcodegen;
 		static makeNumeric(digits) {
 			if (!QrSegment.isNumeric(digits)) throw new RangeError('String contains non-numeric characters');
 			let bb = [];
-			for (let i = 0; i < digits.length; ) {
+			for (let i = 0; i < digits.length;) {
 				// Consume up to 3 digits per iteration
 				const n = Math.min(digits.length - i, 3);
 				appendBits(parseInt(digits.substring(i, i + n), 10), n * 3 + 1, bb);

@@ -7,26 +7,13 @@ import Gtk from 'gi://Gtk';
 
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { registerClass } from '../../common/gjs.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 const ShortcutLabel = ('ShortcutLabel' in Gtk && !('ShortcutLabel' in Adw) ? Gtk : Adw).ShortcutLabel;
 
 function isEmptyBinding(keyval, keycode, mask) {
-	return keyval === 0 && keycode === 0 && mask === 0;
+	return keyval === 0 && keycode === 0 && mask === Gdk.ModifierType.NO_MODIFIER_MASK;
 }
 
 function keyvalIsForbidden(keyval) {
@@ -53,7 +40,7 @@ function isValidBinding(keyval, keycode, mask) {
 	if (isEmptyBinding(keyval, keycode, mask)) {
 		return false;
 	}
-	if ((mask === 0 || mask === Gdk.ModifierType.SHIFT_MASK) && keycode !== 0) {
+	if ((mask === Gdk.ModifierType.NO_MODIFIER_MASK || mask === Gdk.ModifierType.SHIFT_MASK) && keycode !== 0) {
 		if (
 			(keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
 			(keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z) ||
@@ -65,7 +52,7 @@ function isValidBinding(keyval, keycode, mask) {
 			(keyval >= Gdk.KEY_hebrew_doublelowline && keyval <= Gdk.KEY_hebrew_taf) ||
 			(keyval >= Gdk.KEY_Thai_kokai && keyval <= Gdk.KEY_Thai_lekkao) ||
 			(keyval >= Gdk.KEY_Hangul_Kiyeog && keyval <= Gdk.KEY_Hangul_J_YeorinHieuh) ||
-			(keyval === Gdk.KEY_space && mask === 0) ||
+			(keyval === Gdk.KEY_space && mask === Gdk.ModifierType.NO_MODIFIER_MASK) ||
 			keyvalIsForbidden(keyval)
 		) {
 			return false;

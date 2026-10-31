@@ -7,23 +7,12 @@ import Shell from 'gi://Shell';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { instanceofAction, instanceofActionSubmenu, loadConfig } from '../common/actions.js';
 import { getActionsConfigPath } from '../common/constants.js';
 import { registerClass } from '../common/gjs.js';
 
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
+var ShortcutManager_1;
 
 export const Shortcut = {
 	Open: 'open-clipboard-dialog-shortcut',
@@ -33,6 +22,7 @@ export const Shortcut = {
 	Edit: 'edit-item-shortcut',
 	EditTitle: 'edit-title-shortcut',
 	Menu: 'open-menu-shortcut',
+	TogglePinnedSearch: 'toggle-pinned-search-shortcut',
 };
 
 let ShortcutBinding = class ShortcutBinding extends GObject.Object {
@@ -68,7 +58,11 @@ ShortcutBinding = __decorate(
 	],
 	ShortcutBinding,
 );
-let ShortcutManager = class ShortcutManager extends GObject.Object {
+const ShortcutManagerSignals = {
+	'open-clipboard-dialog': {},
+	'toggle-incognito-mode': {},
+};
+let ShortcutManager = (ShortcutManager_1 = class ShortcutManager extends GObject.Object {
 	ext;
 	_actor;
 	_shortcuts = {};
@@ -87,6 +81,7 @@ let ShortcutManager = class ShortcutManager extends GObject.Object {
 		this.registerShortcut(Shortcut.Edit);
 		this.registerShortcut(Shortcut.EditTitle);
 		this.registerShortcut(Shortcut.Menu);
+		this.registerShortcut(Shortcut.TogglePinnedSearch);
 		this._actor = actor;
 		actor.connectObject(
 			'key-press-event',
@@ -177,7 +172,7 @@ let ShortcutManager = class ShortcutManager extends GObject.Object {
 	}
 
 	getShortcutForKeyBinding(keyval, mask) {
-		const accelerator = Meta.accelerator_name(mask, keyval);
+		const accelerator = ShortcutManager_1.acceleratorName(mask, keyval);
 		for (const [key, binding] of Object.entries(this._shortcuts)) {
 			if (binding.shortcuts.includes(accelerator)) return key;
 		}
@@ -185,7 +180,7 @@ let ShortcutManager = class ShortcutManager extends GObject.Object {
 	}
 
 	getActionForKeyBinding(keyval, mask) {
-		const accelerator = Meta.accelerator_name(mask, keyval);
+		const accelerator = ShortcutManager_1.acceleratorName(mask, keyval);
 		return this._actions[accelerator] ?? null;
 	}
 
@@ -197,17 +192,19 @@ let ShortcutManager = class ShortcutManager extends GObject.Object {
 		this._monitor?.disconnectObject(this);
 		this._monitor.cancel();
 	}
-};
-ShortcutManager = __decorate(
+
+	static acceleratorName(mask, keyval) {
+		const accelerator = Meta.accelerator_name(mask, keyval);
+		return accelerator.replace(/Alt_[LR]|ISO_Level3_Shift$/g, 'Alt');
+	}
+});
+ShortcutManager = ShortcutManager_1 = __decorate(
 	[
 		registerClass({
 			Properties: {
 				shift: GObject.ParamSpec.boolean('shift', null, null, GObject.ParamFlags.READABLE, false),
 			},
-			Signals: {
-				'open-clipboard-dialog': {},
-				'toggle-incognito-mode': {},
-			},
+			Signals: ShortcutManagerSignals,
 		}),
 	],
 	ShortcutManager,

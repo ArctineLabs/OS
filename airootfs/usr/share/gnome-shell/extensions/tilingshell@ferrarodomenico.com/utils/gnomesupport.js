@@ -32,8 +32,15 @@ function maximizeWindow(window) {
 function unmaximizeWindow(window) {
   window.get_maximized ? window.unmaximize(Meta.MaximizeFlags.BOTH) : window.unmaximize();
 }
+
+function getDefaultSeat() {
+  const clutter = Clutter;
+  const backend = clutter.get_default_backend ? clutter.get_default_backend() : global.stage.get_context().get_backend();
+  return backend.get_default_seat();
+}
 export {
   buildBlurEffect,
+  getDefaultSeat,
   getEventCoords,
   maximizeWindow,
   unmaximizeWindow,

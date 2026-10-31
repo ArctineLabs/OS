@@ -1,22 +1,9 @@
 import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { registerClass } from './gjs.js';
 import { ClipboardHistory } from './settings.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 const DBusInterfaceXml = `
 <node>
@@ -30,6 +17,14 @@ const DBusInterfaceXml = `
 	</interface>
 </node>
 `.trim();
+const DbusServiceSignals = {
+	'toggle': {},
+	'show': {},
+	'hide': {},
+	'clear-history': {
+		param_types: [GObject.TYPE_INT],
+	},
+};
 let DbusService = class DbusService extends GObject.Object {
 	dbus;
 	ownerId;
@@ -134,14 +129,7 @@ let DbusService = class DbusService extends GObject.Object {
 DbusService = __decorate(
 	[
 		registerClass({
-			Signals: {
-				'toggle': {},
-				'show': {},
-				'hide': {},
-				'clear-history': {
-					param_types: [GObject.TYPE_INT],
-				},
-			},
+			Signals: DbusServiceSignals,
 		}),
 	],
 	DbusService,

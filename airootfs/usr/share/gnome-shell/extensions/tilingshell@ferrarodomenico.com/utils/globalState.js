@@ -244,18 +244,24 @@ const _GlobalState = class _GlobalState extends GObject.Object {
 
   setSelectedLayoutOfMonitor(layoutToSelectId, monitorIndex) {
     const selected = Settings.get_selected_layouts();
-    selected[global.workspaceManager.get_active_workspace_index()][monitorIndex] = layoutToSelectId;
-    const n_workspaces = global.workspaceManager.get_n_workspaces();
-    if (global.workspaceManager.get_active_workspace_index() === n_workspaces - 2) {
-      const lastWs = global.workspaceManager.get_workspace_by_index(
-        n_workspaces - 1
-      );
-      if (!lastWs) return;
-      const tiledWindows = getWindows(lastWs).find(
-        (win) => win.assignedTile && win.get_monitor() === monitorIndex
-      );
-      if (!tiledWindows) {
-        selected[lastWs.index()][monitorIndex] = layoutToSelectId;
+    if (Settings.SYNC_LAYOUT_ACROSS_WORKSPACES) {
+      for (let i = 0; i < selected.length; i++) {
+        selected[i][monitorIndex] = layoutToSelectId;
+      }
+    } else {
+      selected[global.workspaceManager.get_active_workspace_index()][monitorIndex] = layoutToSelectId;
+      const n_workspaces = global.workspaceManager.get_n_workspaces();
+      if (global.workspaceManager.get_active_workspace_index() === n_workspaces - 2) {
+        const lastWs = global.workspaceManager.get_workspace_by_index(
+          n_workspaces - 1
+        );
+        if (!lastWs) return;
+        const tiledWindows = getWindows(lastWs).find(
+          (win) => win.assignedTile && win.get_monitor() === monitorIndex
+        );
+        if (!tiledWindows) {
+          selected[lastWs.index()][monitorIndex] = layoutToSelectId;
+        }
       }
     }
     Settings.save_selected_layouts(selected);

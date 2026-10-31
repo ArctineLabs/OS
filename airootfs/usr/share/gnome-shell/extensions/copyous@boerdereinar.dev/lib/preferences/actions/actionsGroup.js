@@ -8,6 +8,7 @@ import Pango from 'gi://Pango';
 
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { instanceofAction, instanceofActionSubmenu, instanceofCommandAction } from '../../common/actions.js';
 import { JsObjectWrapper, registerClass } from '../../common/gjs.js';
 import { Icon } from '../../common/icons.js';
@@ -15,19 +16,6 @@ import { NestedListBox } from '../utils.js';
 import { AddActionDialog, EditActionDialog, TypesBox } from './actionDialog.js';
 import { AddActionSubmenuDialog, EditActionSubmenuDialog } from './actionSubMenuDialog.js';
 
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 var ActionSubmenuRow_1, ActionRow_1;
 
 Gio._promisify(Adw.AlertDialog.prototype, 'choose');
@@ -180,7 +168,7 @@ let ActionSubmenuRow = (ActionSubmenuRow_1 = class ActionSubmenuRow extends Acti
 		const dropController = new Gtk.DropControllerMotion();
 		const addActionDropController = new Gtk.DropControllerMotion();
 		const dragSource = new Gtk.DragSource({ actions: Gdk.DragAction.MOVE });
-		const expanderRow = this.child.get_first_child()?.get_first_child();
+		const expanderRow = this.child.get_first_child().get_first_child();
 		expanderRow.add_controller(dropController);
 		expanderRow.add_controller(dragSource);
 		this._addActionButton.add_controller(addActionDropController);

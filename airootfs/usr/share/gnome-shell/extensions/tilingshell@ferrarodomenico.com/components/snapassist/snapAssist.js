@@ -8,7 +8,6 @@ import SignalHandling from "../../utils/signalHandling.js";
 import {
   buildMarginOf,
   enableScalingFactorSupport,
-  getMonitorScalingFactor,
   getScalingFactorOf
 } from "../../utils/ui.js";
 import { buildBlurEffect } from "../../utils/gnomesupport.js";
@@ -27,8 +26,7 @@ const _SnapAssistContent = class _SnapAssistContent extends St.BoxLayout {
   _blur;
   _snapAssistantThreshold;
   _snapAssistantAnimationTime;
-  _monitorIndex;
-  constructor(container, monitorIndex) {
+  constructor(container) {
     super({
       name: "snap_assist_content",
       xAlign: Clutter.ActorAlign.CENTER,
@@ -45,8 +43,7 @@ const _SnapAssistContent = class _SnapAssistContent extends St.BoxLayout {
     this._padding = 0;
     this._blur = false;
     this._snapAssistantAnimationTime = 100;
-    this._monitorIndex = monitorIndex;
-    this._snapAssistantThreshold = 54 * getMonitorScalingFactor(this._monitorIndex);
+    this._snapAssistantThreshold = 54 * getScalingFactorOf(this)[1];
     Settings.bind(
       Settings.KEY_ENABLE_BLUR_SNAP_ASSISTANT,
       this,
@@ -93,7 +90,7 @@ const _SnapAssistContent = class _SnapAssistContent extends St.BoxLayout {
   }
 
   set snapAssistantThreshold(value) {
-    this._snapAssistantThreshold = value * getMonitorScalingFactor(this._monitorIndex);
+    this._snapAssistantThreshold = value * getScalingFactorOf(this)[1];
   }
 
   set snapAssistantAnimationTime(value) {
@@ -299,13 +296,13 @@ registerGObjectClass(_SnapAssistContent, {
 let SnapAssistContent = _SnapAssistContent;
 const _SnapAssist = class _SnapAssist extends St.Widget {
   _content;
-  constructor(parent, workArea, monitorIndex, scalingFactor) {
+  constructor(parent, workArea, scalingFactor) {
     super();
     parent.add_child(this);
     this.workArea = workArea;
     this.set_clip(0, 0, workArea.width, workArea.height);
     if (scalingFactor) enableScalingFactorSupport(this, scalingFactor);
-    this._content = new SnapAssistContent(this, monitorIndex);
+    this._content = new SnapAssistContent(this);
   }
 
   set workArea(newWorkArea) {

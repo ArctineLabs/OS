@@ -340,7 +340,7 @@ const _TilingLayout = class _TilingLayout extends LayoutWidget {
     let bestDistance = -1;
     const sourceCenter = {
       x: source.x + source.width / 2,
-      y: source.x + source.height / 2
+      y: source.y + source.height / 2
     };
     for (let i = 0; i < this._previews.length; i++) {
       const preview = this._previews[i];

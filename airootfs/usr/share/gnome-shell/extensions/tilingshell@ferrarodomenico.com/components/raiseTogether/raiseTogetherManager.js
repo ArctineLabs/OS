@@ -58,8 +58,11 @@ class RaiseTogetherManager {
 
   _onTiledWindowRaised(tiledWindow) {
     const workspace = tiledWindow.get_workspace();
+    const monitorIndex = tiledWindow.get_monitor();
     getWindows(workspace).forEach((winSameWorkspace) => {
       if (!winSameWorkspace.assignedTile) return;
+      if (Settings.RAISE_TOGETHER_CURRENT_MONITOR_ONLY && winSameWorkspace.get_monitor() !== monitorIndex)
+        return;
       this._stopRaiseSignalHandling(winSameWorkspace);
       winSameWorkspace.raise();
       this._restartRaiseSignalHandling(winSameWorkspace);

@@ -97,9 +97,13 @@ RUN echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel && \
 
 RUN chmod 644 /etc/resolv.conf
 RUN chmod 644 /usr/share/gnome-background-properties/spookymonth.xml
+RUN chmod 644 /usr/share/gnome-background-properties/kariya.xml
 
 RUN chmod 4755 /usr/bin/newgidmap && \
     chmod 4755 /usr/bin/newuidmap
+
+# Hopes and prayers to end GSConnect's complaints
+RUN ln -sfn /usr/share/glib-2.0 /usr/local/share/glib-2.0
 
 # Locale generation
 RUN locale-gen

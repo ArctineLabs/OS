@@ -1,31 +1,37 @@
-export function get_effects_groups(_ = _ => '') {
+export function get_effects_groups(_) {
     return {
-        blur_effects: {
-            name: _('Blur effects'),
+        blur: {
+            name: _('Blur'),
             contains: [
-                'native_static_gaussian_blur',
-                'gaussian_blur',
-                'monte_carlo_blur',
+                'dual_kawase_blur',
+                'refraction',
             ],
         },
-        texture_effects: {
-            name: _('Texture effects'),
+        color: {
+            name: _('Color'),
+            contains: [
+                'color',
+                'luminosity',
+            ],
+        },
+        texture: {
+            name: _('Texture'),
+            contains: [
+                'noise',
+                'pixelize',
+                'wave',
+                'derivative',
+            ],
+        },
+        advanced: {
+            name: _('Advanced'),
+            description: _('Building blocks that are mostly useful combined with other effects.'),
             contains: [
                 'downscale',
                 'upscale',
-                'pixelize',
-                'refraction',
-                'derivative',
-                'noise',
-                'color',
-                'luminosity',
                 'rgb_to_hsl',
                 'hsl_to_rgb',
             ],
-        },
-        shape_effects: {
-            name: _('Shape effects'),
-            contains: ['corner'],
         },
     };
 }

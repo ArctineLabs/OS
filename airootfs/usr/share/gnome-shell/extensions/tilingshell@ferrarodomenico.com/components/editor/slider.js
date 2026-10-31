@@ -41,10 +41,7 @@ const _Slider = class _Slider extends St.Button {
       Math.round(Math.round(x - this.width / 2)),
       Math.round(y - this.height / 2)
     );
-    this.connect(
-      "notify::hover",
-      () => global.display.set_cursor(this.preferredCursor)
-    );
+    this.connect("notify::hover", () => this._setPreferredCursor());
     this.connect("destroy", this._onDestroy.bind(this));
   }
 
@@ -64,6 +61,16 @@ const _Slider = class _Slider extends St.Button {
     const horizCursor = Meta.Cursor.WEST_RESIZE ?? Meta.Cursor.W_RESIZE;
     const vertCursor = Meta.Cursor.NORTH_RESIZE ?? Meta.Cursor.N_RESIZE;
     return this.hover || this._dragging ? this._horizontalDir ? horizCursor : vertCursor : Meta.Cursor.DEFAULT;
+  }
+
+  _setPreferredCursor() {
+    if ("set_cursor_type" in this) {
+      const CursorType = Clutter.CursorType;
+      const cursor = this.hover || this._dragging ? this._horizontalDir ? CursorType.W_RESIZE : CursorType.N_RESIZE : CursorType.DEFAULT;
+      this.set_cursor_type(cursor);
+    } else {
+      global.display.set_cursor(this.preferredCursor);
+    }
   }
 
   addTile(tile) {
@@ -202,7 +209,7 @@ const _Slider = class _Slider extends St.Button {
   _startDragging(event) {
     if (this._dragging) return Clutter.EVENT_PROPAGATE;
     this._dragging = true;
-    global.display.set_cursor(this.preferredCursor);
+    this._setPreferredCursor();
     this._grab = global.stage.grab(this);
     const [stageX, stageY] = getEventCoords(event);
     this._move(stageX, stageY);
@@ -218,7 +225,7 @@ const _Slider = class _Slider extends St.Button {
       this._dragging = false;
       this._lastEventCoord = null;
     }
-    global.display.set_cursor(this.preferredCursor);
+    this._setPreferredCursor();
     return Clutter.EVENT_STOP;
   }
 

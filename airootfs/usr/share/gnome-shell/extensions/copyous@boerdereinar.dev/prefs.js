@@ -23,6 +23,7 @@ import { BehaviorSettings } from './lib/preferences/general/behaviorSettings.js'
 import { FeedbackSettings } from './lib/preferences/general/feedbackSettings.js';
 import { HistorySettings } from './lib/preferences/general/historySettings.js';
 import { LocationsGroup } from './lib/preferences/general/locationsGroup.js';
+import { VersionSettings } from './lib/preferences/general/versionSettings.js';
 import { DialogShortcuts } from './lib/preferences/shortcuts/dialogShortcuts.js';
 import { ItemActivationShortcuts, ItemShortcuts } from './lib/preferences/shortcuts/itemShortcuts.js';
 import { NavigationShortcuts } from './lib/preferences/shortcuts/navigationShortcuts.js';
@@ -36,8 +37,8 @@ import {
 function findHeaderBar(window) {
 	// Depth first search for the header bar
 	const stack = [window];
-	let widget = undefined;
-	while ((widget = stack.pop())) {
+	while (stack.length > 0) {
+		const widget = stack.pop();
 		if (widget instanceof Adw.HeaderBar) {
 			return widget;
 		} else {
@@ -83,6 +84,7 @@ export default class Preferences extends ExtensionPreferences {
 		dependenciesButton.connect('hljs-installed', () => dependenciesSettings.openHighlightJsPage());
 		general.add(dependenciesSettings);
 		general.add(new LocationsGroup(this, window));
+		general.add(new VersionSettings(this, window));
 
 		// Customization page
 		const customization = new Adw.PreferencesPage({
@@ -112,7 +114,7 @@ export default class Preferences extends ExtensionPreferences {
 		shortcuts.add(new ItemActivationShortcuts(this));
 		shortcuts.add(new PopupMenuShortcuts());
 		shortcuts.add(new NavigationShortcuts());
-		shortcuts.add(new SearchShortcuts());
+		shortcuts.add(new SearchShortcuts(this));
 		shortcuts.add(new SearchNavigationShortcuts());
 		shortcuts.add(new SearchScrollShortcuts(this));
 

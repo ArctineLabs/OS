@@ -1,30 +1,16 @@
 import Clutter from 'gi://Clutter';
-import Cogl from 'gi://Cogl';
 import GObject from 'gi://GObject';
-import Graphene from 'gi://Graphene';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { ActiveState } from '../../common/constants.js';
 import { flagsParamSpec, registerClass } from '../../common/gjs.js';
 import { MiddleClickAction } from '../../common/settings.js';
 import { ClipboardEntry } from '../../database/database.js';
+import { ButtonMask } from '../../misc/compatibility.js';
 import { Shortcut } from '../../misc/shortcuts.js';
+import { HoleEffect } from '../effects/holeEffect.js';
 import { ClipboardItemHeader } from './clipboardItemHeader.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 let ClipboardItem = class ClipboardItem extends St.Button {
 	ext;
@@ -39,7 +25,7 @@ let ClipboardItem = class ClipboardItem extends St.Button {
 	constructor(ext, entry, icon, title) {
 		super({
 			style_class: 'clipboard-item',
-			button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+			button_mask: ButtonMask.PRIMARY | ButtonMask.SECONDARY,
 			x_expand: false,
 			y_expand: false,
 			track_hover: true,
@@ -142,9 +128,9 @@ let ClipboardItem = class ClipboardItem extends St.Button {
 	updateMiddleClickAction() {
 		this._middleClickAction = this.ext.settings.get_enum('middle-click-action');
 		if (this._middleClickAction === MiddleClickAction.None) {
-			this.button_mask &= ~St.ButtonMask.TWO;
+			this.button_mask &= ~ButtonMask.MIDDLE;
 		} else {
-			this.button_mask |= St.ButtonMask.TWO;
+			this.button_mask |= ButtonMask.MIDDLE;
 		}
 	}
 
@@ -298,87 +284,3 @@ ClipboardItem = __decorate(
 );
 
 export { ClipboardItem };
-
-// Based on https://gitlab.gnome.org/GNOME/mutter/-/blob/8b5c757bea75b7712bbe09c2018a8eb15b4d22cc/src/compositor/meta-background-content.c
-let HoleEffect = class HoleEffect extends Shell.GLSLEffect {
-	target;
-	_sizeLocation;
-	_holeBoxLocation;
-
-	constructor(target) {
-		super();
-		this.target = target;
-		this._sizeLocation = this.get_uniform_location('size');
-		this._holeBoxLocation = this.get_uniform_location('hole_box');
-		target.connect('notify::allocation', () => this.queue_repaint());
-	}
-
-	vfunc_paint_target(node, paintContext) {
-		const size = this.actor.get_transformed_size();
-		this.set_uniform_float(this._sizeLocation, 2, size);
-		const position = this.target.apply_relative_transform_to_point(this.actor, new Graphene.Point3D());
-		const [width, height] = this.target.get_transformed_size();
-		this.set_uniform_float(this._holeBoxLocation, 4, [position.x - 1.5, position.y + 1, width + 2, height + 1]);
-		super.vfunc_paint_target(node, paintContext);
-	}
-
-	vfunc_build_pipeline() {
-		const dec = `
-			uniform sampler2D tex;
-			uniform vec2 size;
-			uniform vec4 hole_box;
-
-			float circle_bounds(vec2 p, vec2 center, float radius) {
-				vec2 delta = p - center;
-				float dist_squared = dot(delta, delta);
-				float dist = sqrt(dist_squared);
-
-				float outer_radius = radius + 0.5;
-				if (dist >= outer_radius)
-					return 1.0;
-
-				float inner_radius = radius - 0.5;
-				if (dist <= inner_radius)
-					return 0.0;
-
-				return dist - inner_radius;
-			}
-
-			float rounded_rect_coverage(vec2 p, vec4 bounds, float radius) {
-				if (p.x < bounds.x || p.x > bounds.z || p.y < bounds.y || p.y > bounds.w)
-					return 1.0;
-
-				vec2 center;
-
-				float center_left = bounds.x + radius;
-				float center_right = bounds.z - radius;
-
-				if (p.x < center_left)
-					center.x = center_left;
-				else if (p.x > center_right)
-					center.x = center_right;
-				else
-					return 0.0;
-
-				center.y = bounds.y + radius;
-
-				return circle_bounds(p, center, radius);
-			}`;
-		const src = `
-			vec2 uv = cogl_tex_coord_in[0].xy;
-			vec2 p = size * cogl_tex_coord_in[0].xy;
-			vec4 c = cogl_color_in * texture2D(tex, uv);
-
-			if (hole_box.z <= 2.0 || hole_box.w <= 2.0) {
-				cogl_color_out = c;
-				return;
-			}
-
-			float radius = hole_box.w / 2.0;
-			vec4 bounds = vec4(hole_box.x, hole_box.y, hole_box.x + hole_box.z, hole_box.y + hole_box.w);
-			float alpha = rounded_rect_coverage(p, bounds, radius);
-			cogl_color_out = vec4(c.rgb * alpha, min(alpha, c.a));`;
-		this.add_glsl_snippet(Cogl.SnippetHook.FRAGMENT, dec, src, true);
-	}
-};
-HoleEffect = __decorate([registerClass()], HoleEffect);

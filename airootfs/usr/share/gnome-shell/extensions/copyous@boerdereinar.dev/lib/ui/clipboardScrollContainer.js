@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { registerClass } from '../common/gjs.js';
 import {
 	get_first_visible_child,
@@ -12,20 +13,6 @@ import {
 import { ClipboardItem } from './items/clipboardItem.js';
 import { State, StatusItem } from './items/statusItem.js';
 import { SearchChange } from './searchEntry.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 let ClipboardScrollContainer = class ClipboardScrollContainer extends St.BoxLayout {
 	_statusItem;
@@ -123,21 +110,23 @@ let ClipboardScrollContainer = class ClipboardScrollContainer extends St.BoxLayo
 
 	addItem(item) {
 		this.insertOrMoveItem(item);
-		if (this._lastQuery) {
-			item.search(this._lastQuery);
-		}
 
 		// Move item when datetime changes
-		item.entry.connect('notify::datetime', () => this.insertOrMoveItem(item));
+		item.entry.connect('notify::datetime', () => this.insertOrMoveItem(item, false));
 
 		// Delete item when deleted
 		item.entry.connect('delete', () => this.removeItem(item));
 
-		// Update search when entry changes
-		item.entry.connect('notify', () => this.updateSearch(item));
+		// Update search only when properties used by search can change.
+		item.entry.connect('notify::content', () => this.updateSearch(item));
+		item.entry.connect('notify::pinned', () => this.updateSearch(item));
+		item.entry.connect('notify::tag', () => this.updateSearch(item));
+		item.entry.connect('notify::type', () => this.updateSearch(item));
+		item.entry.connect('notify::metadata', () => this.updateSearch(item));
+		item.entry.connect('notify::title', () => this.updateSearch(item));
 	}
 
-	insertOrMoveItem(item) {
+	insertOrMoveItem(item, search = true) {
 		this.removePseudoclasses();
 		if (item.get_parent() === this) this.remove_child(item);
 		let i = 0;
@@ -151,8 +140,11 @@ let ClipboardScrollContainer = class ClipboardScrollContainer extends St.BoxLayo
 		if (i === this.get_n_children()) {
 			this.add_child(item);
 		}
-		this.updateSearch(item);
-		this.updateVisible();
+		if (search && this._lastQuery) {
+			this.updateSearch(item);
+		} else {
+			this.updateVisible();
+		}
 	}
 
 	clearItems() {

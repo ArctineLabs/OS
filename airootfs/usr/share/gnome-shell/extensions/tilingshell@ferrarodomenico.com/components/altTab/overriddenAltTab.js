@@ -43,6 +43,7 @@ class OverriddenAltTab {
     this._switcherList._squareItems = false;
     const oldFunction = OverriddenAltTab._old_show?.bind(this);
     const res = !oldFunction || oldFunction(backward, binding, mask);
+    if (!this._switcherList || !this._items?.length) return res;
     const tiledWindows = this._getWindowList().filter((win) => win.assignedTile);
     if (tiledWindows.length <= 1) return res;
     const tiles = tiledWindows.map((win) => win.assignedTile).filter((tile) => tile !== void 0);

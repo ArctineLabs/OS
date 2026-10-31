@@ -7,6 +7,7 @@ import Soup from 'gi://Soup?version=3.0';
 
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import {
 	HljsSha512,
 	HljsUrls,
@@ -17,20 +18,6 @@ import {
 } from '../../common/constants.js';
 import { registerClass } from '../../common/gjs.js';
 import { Icon } from '../../common/icons.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 export async function checkGda(prefs) {
 	try {

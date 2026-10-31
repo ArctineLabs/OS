@@ -16,6 +16,7 @@ export const Settings = {
 	PasteOnCopy: 'paste-on-copy',
 	SyncPrimary: 'sync-primary',
 	UpdateDateOnCopy: 'update-date-on-copy',
+	IndicatorDisplay: 'indicator-display',
 	ShowIndicator: 'show-indicator',
 	ShowContentIndicator: 'show-content-indicator',
 	WiggleIndicator: 'wiggle-indicator',
@@ -92,6 +93,7 @@ export const Settings = {
 	EditItemShortcut: 'edit-item-shortcut',
 	EditTitleShortcut: 'edit-title-shortcut',
 	OpenMenuShortcut: 'open-menu-shortcut',
+	TogglePinnedSearchShortcut: 'toggle-pinned-search-shortcut',
 	MiddleClickAction: 'middle-click-action',
 	SwapCopyShortcut: 'swap-copy-shortcut',
 	SwapScrollShortcut: 'swap-scroll-shortcut',
@@ -125,8 +127,9 @@ export const SettingsTypes = {
 	[Settings.PasteOnCopy]: 'boolean', // deprecated
 	[Settings.SyncPrimary]: 'boolean',
 	[Settings.UpdateDateOnCopy]: 'boolean',
-	[Settings.ShowIndicator]: 'boolean',
-	[Settings.ShowContentIndicator]: 'boolean',
+	[Settings.IndicatorDisplay]: 'enum',
+	[Settings.ShowIndicator]: 'boolean', // deprecated
+	[Settings.ShowContentIndicator]: 'boolean', // deprecated
 	[Settings.WiggleIndicator]: 'boolean',
 	[Settings.SendNotification]: 'boolean',
 	[Settings.Sound]: 'string',
@@ -159,6 +162,7 @@ export const SettingsTypes = {
 	[Settings.EditItemShortcut]: 'strv',
 	[Settings.EditTitleShortcut]: 'strv',
 	[Settings.OpenMenuShortcut]: 'strv',
+	[Settings.TogglePinnedSearchShortcut]: 'strv',
 	[Settings.MiddleClickAction]: 'enum',
 	[Settings.SwapCopyShortcut]: 'boolean',
 	[Settings.SwapScrollShortcut]: 'boolean',
@@ -296,6 +300,13 @@ export const MiddleClickAction = {
 	Delete: 2,
 };
 
+export const IndicatorDisplay = {
+	Hidden: 0,
+	IconOnly: 1,
+	ClipboardContentOnly: 2,
+	IconAndClipboardContent: 3,
+};
+
 export function bind_enum(settings, key, object, property) {
 	object.set_property(property, settings.get_enum(key));
 	settings.connect(`changed::${key}`, () => object.set_property(property, settings.get_enum(key)));
@@ -314,9 +325,28 @@ export function bind_flags(settings, key, object, property) {
 	});
 }
 
+function getIndicatorDisplay(showIcon, showContent) {
+	if (showIcon && showContent) return IndicatorDisplay.IconAndClipboardContent;
+	if (showIcon) return IndicatorDisplay.IconOnly;
+	if (showContent) return IndicatorDisplay.ClipboardContentOnly;
+	return IndicatorDisplay.Hidden;
+}
+
 export function migrateSettings(settings) {
 	// inverted paste-on-copy -> swap-copy-shortcut
 	const pasteOnCopy = settings.get_user_value('paste-on-copy');
 	if (pasteOnCopy !== null) settings.set_boolean('swap-copy-shortcut', !pasteOnCopy.get_boolean());
 	settings.reset('paste-on-copy');
+
+	// show-indicator + show-content-indicator -> indicator-display
+	const indicatorDisplay = settings.get_user_value('indicator-display');
+	const showIndicator = settings.get_user_value('show-indicator');
+	const showContentIndicator = settings.get_user_value('show-content-indicator');
+	if (indicatorDisplay === null && (showIndicator !== null || showContentIndicator !== null)) {
+		const showIcon = showIndicator?.get_boolean() ?? settings.get_boolean('show-indicator');
+		const showContent = showContentIndicator?.get_boolean() ?? settings.get_boolean('show-content-indicator');
+		settings.set_enum('indicator-display', getIndicatorDisplay(showIcon, showContent));
+	}
+	settings.reset('show-indicator');
+	settings.reset('show-content-indicator');
 }

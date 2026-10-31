@@ -11,23 +11,10 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { ItemType } from '../../common/constants.js';
 import { registerClass } from '../../common/gjs.js';
 import { Icon, loadIcon } from '../../common/icons.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 /** Entry with proper height for multiline text and event forwarding */
 let Entry = class Entry extends St.Entry {
@@ -78,10 +65,12 @@ let Entry = class Entry extends St.Entry {
 
 	updateHover() {
 		this.sync_hover();
+		const display = global.display;
+		const cursor = Meta;
 		if (this.hover) {
-			global.display.set_cursor(Meta.Cursor.TEXT);
+			display.set_cursor(cursor.Cursor.TEXT);
 		} else {
-			global.display.set_cursor(Meta.Cursor.DEFAULT);
+			display.set_cursor(cursor.Cursor.DEFAULT);
 		}
 	}
 };

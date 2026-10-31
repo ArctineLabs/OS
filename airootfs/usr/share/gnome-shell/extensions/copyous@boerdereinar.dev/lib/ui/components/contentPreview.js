@@ -5,25 +5,12 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
 
-import { ActiveState } from '../../common/constants.js';
+import { __decorate } from '../../../thirdparty/tslib.js';
+import { ActiveState, getCachePath } from '../../common/constants.js';
 import { enumParamSpec, flagsParamSpec, registerClass } from '../../common/gjs.js';
 import { Icon, loadIcon } from '../../common/icons.js';
 import { BackgroundSize, FilePreviewType } from '../../common/settings.js';
 import { CodeLabel } from './codeLabel.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 export const FileType = {
 	Unknown: 'Unknown',
@@ -48,6 +35,44 @@ ContentPreview = __decorate([registerClass()], ContentPreview);
 
 export { ContentPreview };
 
+/**
+ * Largest image edge that is passed to St as a background-image directly.
+ * Anything larger gets a cached downscaled copy, since St crashes gnome-shell
+ * when the texture cache fails to load an image (e.g. one that exceeds
+ * GL_MAX_TEXTURE_SIZE, usually 16384px).
+ */
+const MAX_PREVIEW_EDGE = 4096;
+const PREVIEW_TARGET_EDGE = 1024;
+
+/**
+ * Gets a file that is safe to use as a preview background-image
+ * @param ext The extension
+ * @param image The original image
+ * @param width The width of the original image
+ * @param height The height of the original image
+ * @returns The original image if it is small enough, otherwise a cached downscaled copy
+ */
+function getSafePreviewFile(ext, image, width, height) {
+	if (width <= MAX_PREVIEW_EDGE && height <= MAX_PREVIEW_EDGE) return image;
+	const uri = image.get_uri();
+	const key = GLib.compute_checksum_for_string(GLib.ChecksumType.MD5, uri, uri.length);
+	const previewDir = getCachePath(ext).get_child('previews');
+	if (!previewDir.query_exists(null)) previewDir.make_directory_with_parents(null);
+	const preview = previewDir.get_child(`${key}.png`);
+	if (!preview.query_exists(null)) {
+		const pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+			image.get_path(),
+			PREVIEW_TARGET_EDGE,
+			PREVIEW_TARGET_EDGE,
+			true,
+		);
+		if (!pixbuf.savev(preview.get_path(), 'png', [], [])) {
+			throw new Error('Failed to save downscaled preview');
+		}
+	}
+	return preview;
+}
+
 let ImagePreview = class ImagePreview extends ContentPreview {
 	_backgroundSize = BackgroundSize.Cover;
 	_ratio;
@@ -60,13 +85,14 @@ let ImagePreview = class ImagePreview extends ContentPreview {
 			try {
 				const [, width, height] = GdkPixbuf.Pixbuf.get_file_info(image.get_path());
 				this._ratio = height / width;
+				const previewFile = getSafePreviewFile(ext, image, width, height);
 				const imageBox = new St.Widget({
 					style_class: 'image-box',
 					x_align: Clutter.ActorAlign.FILL,
 					y_align: Clutter.ActorAlign.FILL,
 					x_expand: true,
 					y_expand: true,
-					style: `background-image: url("${image.get_uri()}");`,
+					style: `background-image: url("${previewFile.get_uri()}");`,
 				});
 				this.add_child(imageBox);
 				this._effect = new Clutter.BrightnessContrastEffect();
@@ -157,9 +183,9 @@ let TextPreview = class TextPreview extends ContentPreview {
 		if (language) props.language = { id: language, name: language };
 		const label = new CodeLabel(ext, props);
 		this.add_child(label);
-		this.bind_property('syntax-highlighting', label, 'syntax-highlighting', null);
-		this.bind_property('show-line-numbers', label, 'show-line-numbers', null);
-		this.bind_property('tab-width', label, 'tab-width', null);
+		this.bind_property('syntax-highlighting', label, 'syntax-highlighting', GObject.BindingFlags.DEFAULT);
+		this.bind_property('show-line-numbers', label, 'show-line-numbers', GObject.BindingFlags.DEFAULT);
+		this.bind_property('tab-width', label, 'tab-width', GObject.BindingFlags.DEFAULT);
 	}
 };
 TextPreview = __decorate(
@@ -251,14 +277,14 @@ async function getContentType(file) {
 	if (contentType !== null) {
 		return contentType;
 	}
-	let data = null;
+	let data;
 	try {
 		const stream = await file.read_async(GLib.PRIORITY_DEFAULT, null);
 		data = await stream.read_bytes_async(64, GLib.PRIORITY_DEFAULT, null);
 	} catch {
 		return null;
 	}
-	return Gio.content_type_guess(file.get_path(), data?.toArray())[0];
+	return Gio.content_type_guess(file.get_path(), data.toArray())[0];
 }
 
 /**

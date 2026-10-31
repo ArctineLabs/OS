@@ -62,7 +62,7 @@ function convert_datetime(datetime) {
 // Unescape null values in sql since Gda.Null is not supported in gda 5
 function unescape_sql(connection, builder) {
 	const bstmt = builder.get_statement();
-	const sql = connection.statement_to_sql(bstmt, bstmt.get_parameters()[1], null)[0];
+	const sql = connection.statement_to_sql(bstmt, bstmt.get_parameters()[1], 0)[0];
 	const unescapedSql = sql.replace(/(?<!')'NULL'(?!')/g, 'NULL');
 	return connection.parse_sql_string(unescapedSql)[0];
 }
@@ -584,8 +584,8 @@ export class GdaDatabase {
 				selectBuilder.compound_add_sub_select_from_builder(select2Builder);
 
 				// SELECT id FROM (SELECT id FROM table WHERE ...)
-				const select1Sql = this._connection.statement_to_sql(select1Builder.get_statement(), null, null)[0];
-				const selectSql = this._connection.statement_to_sql(selectBuilder.get_statement(), null, null)[0];
+				const select1Sql = this._connection.statement_to_sql(select1Builder.get_statement(), null, 0)[0];
+				const selectSql = this._connection.statement_to_sql(selectBuilder.get_statement(), null, 0)[0];
 				selectStmt = this._connection.parse_sql_string(selectSql.replace('select1', `(${select1Sql})`))[0];
 			} else {
 				// Ignore compound selector
@@ -602,7 +602,7 @@ export class GdaDatabase {
 
 			// DELETE FROM table WHERE id IN (select)
 			// add_subselect is not exposed as a javascript binding in Gda 5.0
-			const selectSql = this._connection.statement_to_sql(selectStmt, selectStmt.get_parameters()[1], null)[0];
+			const selectSql = this._connection.statement_to_sql(selectStmt, selectStmt.get_parameters()[1], 0)[0];
 			const [deleteStmt] = this._connection.parse_sql_string(`DELETE FROM clipboard WHERE id IN (${selectSql})`);
 			const [rows] = await async_statement_execute_non_select(
 				this._Gda,

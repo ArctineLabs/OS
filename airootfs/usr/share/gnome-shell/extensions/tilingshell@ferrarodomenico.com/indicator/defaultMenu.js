@@ -40,7 +40,7 @@ const _LayoutsRow = class _LayoutsRow extends St.BoxLayout {
     });
     this._monitor = monitor;
     this._label = new St.Label({
-      text: `Monitor ${this._monitor.index + 1}`,
+      text: `${_("Monitor")} ${this._monitor.index + 1}`,
       styleClass: "monitor-layouts-title"
     });
     this.add_child(this._label);
@@ -148,7 +148,7 @@ class DefaultMenu {
         this._container
       );
       const scalingFactor = getMonitorScalingFactor(
-        monitor?.index || Main.layoutManager.primaryIndex
+        monitor?.index ?? Main.layoutManager.primaryIndex
       );
       enableScalingFactorSupport(this._container, scalingFactor);
     }
@@ -198,7 +198,7 @@ class DefaultMenu {
         this._container
       );
       const scalingFactor = getMonitorScalingFactor(
-        monitor?.index || Main.layoutManager.primaryIndex
+        monitor?.index ?? Main.layoutManager.primaryIndex
       );
       enableScalingFactorSupport(this._container, scalingFactor);
       this._updateScaling();

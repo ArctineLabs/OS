@@ -7,10 +7,11 @@
   "shell-version": [
     "48",
     "49",
-    "50"
+    "50",
+    "51"
   ],
   "url": "https://github.com/boerdereinar/copyous",
   "uuid": "copyous@boerdereinar.dev",
-  "version": 9,
-  "version-name": "2.0.1"
+  "version": 12,
+  "version-name": "2.1.2"
 }

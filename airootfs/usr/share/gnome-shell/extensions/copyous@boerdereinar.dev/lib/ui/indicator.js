@@ -14,26 +14,13 @@ import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { Color } from '../common/color.js';
 import { ItemType } from '../common/constants.js';
 import { registerClass } from '../common/gjs.js';
 import { Icon, loadIcon } from '../common/icons.js';
-import { ClipboardHistory } from '../common/settings.js';
+import { ClipboardHistory, IndicatorDisplay } from '../common/settings.js';
 import { VERSION } from '../misc/compatibility.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 let ConfirmClearHistoryDialog = class ConfirmClearHistoryDialog extends ModalDialog.ModalDialog {
 	constructor() {
@@ -111,9 +98,7 @@ let ClipboardIndicator = class ClipboardIndicator extends PanelMenu.Button {
 
 		// Bind properties
 		this.ext.settings.connectObject(
-			'changed::show-indicator',
-			this.updateSettings.bind(this),
-			'changed::show-content-indicator',
+			'changed::indicator-display',
 			this.updateSettings.bind(this),
 			'changed::incognito',
 			this.updateSettings.bind(this),
@@ -125,7 +110,7 @@ let ClipboardIndicator = class ClipboardIndicator extends PanelMenu.Button {
 
 	configurePanelMenuClickGesture() {
 		if (VERSION < 50) return;
-		this._clickGesture?.set_required_button(Clutter.BUTTON_SECONDARY);
+		this._clickGesture.set_required_button(Clutter.BUTTON_SECONDARY);
 	}
 
 	get incognito() {
@@ -143,14 +128,23 @@ let ClipboardIndicator = class ClipboardIndicator extends PanelMenu.Button {
 
 	set previewWidget(widget) {
 		this._previewWidget?.destroy();
-		widget.visible = this.ext.settings.get_boolean('show-content-indicator');
 		this._previewWidget = widget;
 		this._box.add_child(widget);
+		this.updateSettings();
 	}
 
 	updateSettings() {
-		this.visible = this.ext.settings.get_boolean('show-indicator');
-		if (this._previewWidget) this._previewWidget.visible = this.ext.settings.get_boolean('show-content-indicator');
+		const indicatorDisplay = this.ext.settings.get_enum('indicator-display');
+		const showContentIndicator =
+			indicatorDisplay === IndicatorDisplay.ClipboardContentOnly ||
+			indicatorDisplay === IndicatorDisplay.IconAndClipboardContent;
+		const showIconIndicator =
+			indicatorDisplay === IndicatorDisplay.IconOnly ||
+			indicatorDisplay === IndicatorDisplay.IconAndClipboardContent ||
+			(showContentIndicator && !this._previewWidget);
+		this.visible = indicatorDisplay !== IndicatorDisplay.Hidden;
+		this._icon.visible = showIconIndicator;
+		if (this._previewWidget) this._previewWidget.visible = showContentIndicator;
 		this.incognito = this.ext.settings.get_boolean('incognito');
 	}
 
@@ -159,7 +153,7 @@ let ClipboardIndicator = class ClipboardIndicator extends PanelMenu.Button {
 	}
 
 	animate() {
-		if (this.ext.settings.get_boolean('wiggle-indicator')) {
+		if (this._icon.visible && this.ext.settings.get_boolean('wiggle-indicator')) {
 			animationUtils.wiggle(this._icon, { offset: 2, duration: 65, wiggleCount: 3 });
 		}
 	}

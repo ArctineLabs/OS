@@ -1,26 +1,14 @@
 import Adw from 'gi://Adw';
 import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import { __decorate } from '../../../../thirdparty/tslib.js';
 import { registerClass } from '../../../common/gjs.js';
 import { bind_enum } from '../../../common/settings.js';
 import { makeResettable } from '../../utils.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 let CodeItemCustomization = class CodeItemCustomization extends Adw.ExpanderRow {
 	constructor(prefs) {
@@ -52,9 +40,9 @@ let CodeItemCustomization = class CodeItemCustomization extends Adw.ExpanderRow 
 
 		// Bind properties
 		const settings = prefs.getSettings().get_child('code-item');
-		settings.bind('syntax-highlighting', syntaxHighlighting, 'active', null);
-		settings.bind('show-line-numbers', showLineNumbers, 'active', null);
-		settings.bind('show-code-info', showCodeInfo, 'active', null);
+		settings.bind('syntax-highlighting', syntaxHighlighting, 'active', Gio.SettingsBindFlags.DEFAULT);
+		settings.bind('show-line-numbers', showLineNumbers, 'active', Gio.SettingsBindFlags.DEFAULT);
+		settings.bind('show-code-info', showCodeInfo, 'active', Gio.SettingsBindFlags.DEFAULT);
 		bind_enum(settings, 'text-count-mode', textCounter, 'selected');
 		makeResettable(textCounter, settings, 'text-count-mode');
 		showCodeInfo.bind_property('active', textCounter, 'sensitive', GObject.BindingFlags.SYNC_CREATE);

@@ -5,24 +5,12 @@ import Gtk from 'gi://Gtk';
 
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { registerClass } from '../../common/gjs.js';
 import { Icon } from '../../common/icons.js';
+import { IndicatorDisplay, bind_enum } from '../../common/settings.js';
 import { Sound, SoundManager } from '../../common/sound.js';
 import { makeResettable } from '../utils.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 let SoundVolumeRow = class SoundVolumeRow extends Adw.PreferencesRow {
 	slider;
@@ -214,18 +202,17 @@ let FeedbackSettings = class FeedbackSettings extends Adw.PreferencesGroup {
 		super({
 			title: _('Feedback'),
 		});
-		const showIndicator = new Adw.SwitchRow({
-			title: _('Show Indicator'),
-			subtitle: _('Show an indicator on the top panel'),
+		const indicatorDisplay = new Adw.ComboRow({
+			title: _('Indicator Display'),
+			subtitle: _('Choose how the clipboard indicator appears in the top panel'),
+			model: Gtk.StringList.new([
+				_('Hidden'),
+				_('Icon Only'),
+				_('Clipboard Content Only'),
+				_('Icon and Clipboard Content'),
+			]),
 		});
-		this.add(showIndicator);
-		const showContentIndicator = new Adw.SwitchRow({
-			title: _('Show Clipboard Content in Indicator'),
-			subtitle: _('Show the current clipboard content in the indicator'),
-		});
-		this.add(showContentIndicator);
-		showIndicator.bind_property('active', showContentIndicator, 'sensitive', null);
-		this.connect('map', () => (showContentIndicator.sensitive = showIndicator.active));
+		this.add(indicatorDisplay);
 		const wiggleIndicator = new Adw.SwitchRow({
 			title: _('Wiggle Indicator'),
 			subtitle: _('Wiggle the indicator when a clipboard item is copied'),
@@ -254,10 +241,16 @@ let FeedbackSettings = class FeedbackSettings extends Adw.PreferencesGroup {
 
 		// Bind properties
 		const settings = prefs.getSettings();
-		settings.bind('show-indicator', showIndicator, 'active', Gio.SettingsBindFlags.DEFAULT);
-		settings.bind('show-content-indicator', showContentIndicator, 'active', Gio.SettingsBindFlags.DEFAULT);
+		bind_enum(settings, 'indicator-display', indicatorDisplay, 'selected');
 		settings.bind('wiggle-indicator', wiggleIndicator, 'active', Gio.SettingsBindFlags.DEFAULT);
 		settings.bind('send-notification', sendNotification, 'active', Gio.SettingsBindFlags.DEFAULT);
+		const updateWiggleSensitivity = () => {
+			wiggleIndicator.sensitive =
+				indicatorDisplay.selected === IndicatorDisplay.IconOnly ||
+				indicatorDisplay.selected === IndicatorDisplay.IconAndClipboardContent;
+		};
+		indicatorDisplay.connect('notify::selected', updateWiggleSensitivity);
+		updateWiggleSensitivity();
 		makeResettable(playSound, settings, 'sound', 'volume');
 
 		// Check if GSound is installed

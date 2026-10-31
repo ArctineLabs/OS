@@ -1,64 +1,57 @@
 import Gdk from 'gi://Gdk';
 import Gtk from 'gi://Gtk';
-import Gio from 'gi://Gio';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import { update_from_old_settings } from './conveniences/settings_updater.js';
-import { PipelinesManager } from './conveniences/pipelines_manager.js';
-import { Settings } from './conveniences/settings.js';
-import { KEYS } from './conveniences/keys.js';
+import { update_from_old_settings } from './settings/settings_updater.js';
+import { PipelinesManager } from './pipelines/pipelines_manager.js';
+import { Settings } from './settings/settings.js';
+import { KEYS } from './settings/keys.js';
+import { cancel_pick } from './dbus/client.js';
 
 import { addMenu } from './preferences/menu.js';
-import { Pipelines } from './preferences/pipelines.js';
-import { Panel } from './preferences/panel.js';
-import { Overview } from './preferences/overview.js';
-import { Dash } from './preferences/dash.js';
-import { Applications } from './preferences/applications.js';
-import { PopupBlur } from './preferences/popup.js';
-import { Other } from './preferences/other.js';
+import { ShellPage } from './preferences/pages/shell/index.js';
+import { Applications } from './preferences/pages/applications.js';
+import { Pipelines } from './preferences/pages/pipelines/index.js';
 
-import './preferences/pipelines_management/pipeline_choose_row.js';
+import './preferences/widgets/pipeline_choose_row.js';
 
 
 export default class BlurMyShellPreferences extends ExtensionPreferences {
     constructor(metadata) {
         super(metadata);
 
-        // load the icon theme
         let iconPath = this.dir.get_child("icons").get_path();
         let iconTheme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default());
         iconTheme.add_search_path(iconPath);
     }
 
     fillPreferencesWindow(window) {
-        addMenu(window);
+        const gsettings = this.getSettings();
+        update_from_old_settings(gsettings);
 
-        // update from old settings, very important for hacks level specifically
-        update_from_old_settings(this.getSettings());
-
-        const actionGroup = new Gio.SimpleActionGroup();
-        window.insert_action_group('link', actionGroup);
-        const action = new Gio.SimpleAction({ name: 'open-gnome-rounded-blur' });
-        action.connect('activate', () => {
-            Gio.AppInfo.launch_default_for_uri(
-                'https://github.com/aunetx/blur-my-shell/blob/master/scripts/GUIDE.md',
-                null
-            );
-        });
-        actionGroup.add_action(action);
-
-        const preferences = new Settings(KEYS, this.getSettings());
+        const preferences = new Settings(KEYS, gsettings);
         const pipelines_manager = new PipelinesManager(preferences);
 
-        const pipelines_page = new Pipelines(preferences, pipelines_manager, window);
+        addMenu(window, preferences);
 
+        const pipelines_page = new Pipelines(preferences, pipelines_manager, window);
+        const applications_page = new Applications(
+            preferences, window, pipelines_manager, pipelines_page
+        );
+
+        window.add(new ShellPage(preferences, pipelines_manager, pipelines_page, window));
+        window.add(applications_page);
         window.add(pipelines_page);
-        window.add(new Panel(preferences, pipelines_manager, pipelines_page));
-        window.add(new Overview(preferences, pipelines_manager, pipelines_page));
-        window.add(new Dash(preferences, pipelines_manager, pipelines_page));
-        window.add(new Applications(preferences, window, pipelines_manager, pipelines_page));
-        window.add(new PopupBlur(preferences, pipelines_manager, pipelines_page));
-        window.add(new Other(preferences, pipelines_manager, pipelines_page));
+        window.set_default_size(640, 840);
+
+        window.connect('close-request', () => {
+            cancel_pick();
+            applications_page.cleanup();
+            pipelines_page.cleanup();
+            pipelines_manager.destroy();
+            preferences.disconnect_all_settings();
+            return false;
+        });
 
         window.search_enabled = true;
     }

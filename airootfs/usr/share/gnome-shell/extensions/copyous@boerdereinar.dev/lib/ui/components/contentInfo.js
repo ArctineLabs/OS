@@ -8,24 +8,11 @@ import St from 'gi://St';
 
 import { gettext as _, ngettext } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+import { __decorate } from '../../../thirdparty/tslib.js';
 import { enumParamSpec, registerClass } from '../../common/gjs.js';
 import { Icon, loadIcon } from '../../common/icons.js';
 import { TextCountMode } from '../../common/settings.js';
 import { FileType } from './contentPreview.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 function formatBytes(bytes) {
 	const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -44,6 +31,14 @@ function formatTime(seconds) {
 	if (m > 0) res += _('%dm').format(m) + ' ';
 	res += _('%ds').format(s);
 	return res;
+}
+
+function countLines(text) {
+	let count = 1;
+	for (let i = 0; i < text.length; i++) {
+		if (text[i] === '\n') count++;
+	}
+	return count;
 }
 
 let ContentInfo = class ContentInfo extends St.BoxLayout {
@@ -100,19 +95,19 @@ let TextInfo = class TextInfo extends ContentInfo {
 
 	updateCount() {
 		if (this._textCountMode === TextCountMode.Characters) {
+			const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 			let count = 0;
-			const segments = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(this._text);
-			for (const _segment of segments) count++;
+			for (const _segment of segmenter.segment(this._text)) count++;
 			this._countLabel.text = ngettext('%d char', '%d chars', count).format(count);
 		} else if (this._textCountMode === TextCountMode.Words) {
+			const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
 			let count = 0;
-			const segments = new Intl.Segmenter(undefined, { granularity: 'word' }).segment(this._text);
-			for (const segment of segments) {
+			for (const segment of segmenter.segment(this._text)) {
 				if (segment.isWordLike) count++;
 			}
 			this._countLabel.text = ngettext('%d word', '%d words', count).format(count);
 		} else if (this._textCountMode === TextCountMode.Lines) {
-			const count = this._text.split('\n').length;
+			const count = countLines(this._text);
 			this._countLabel.text = ngettext('%d line', '%d lines', count).format(count);
 		}
 	}
@@ -290,7 +285,7 @@ export function tryCreateImageInfo(file, size) {
 export async function tryCreateMediaFileInfo(ext, file, size, cancellable) {
 	try {
 		if (!Gst.is_initialized()) {
-			Gst.init(null);
+			Gst.init(undefined);
 		}
 
 		// https://gitlab.freedesktop.org/gstreamer/gst-plugins-base/-/blob/ce69d1068af058425b083aaa1b8c268b1b2e5ddd/gst-libs/gst/pbutils/gstdiscoverer.c#L340

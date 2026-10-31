@@ -10,11 +10,13 @@ import * as Layout from 'resource:///org/gnome/shell/ui/layout.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { ItemType } from '../common/constants.js';
 import { registerClass } from '../common/gjs.js';
 import { Icon, loadIcon } from '../common/icons.js';
 import { OpenClipboardDialogBehavior } from '../common/settings.js';
 import { VERSION } from '../misc/compatibility.js';
+import { Shortcut } from '../misc/shortcuts.js';
 import { ClipboardScrollView } from './clipboardScrollView.js';
 import { ClipboardItemMenu } from './components/clipboardItemMenu.js';
 import { ConfirmClearHistoryDialog } from './indicator.js';
@@ -28,20 +30,6 @@ import { LinkItem } from './items/linkItem.js';
 import { TextItem } from './items/textItem.js';
 import { CenterBox, CollapsibleHeaderLayout, FitConstraint } from './layout.js';
 import { SearchEntry } from './searchEntry.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 const ANIMATION_TIME = 150;
 let IncognitoButton = class IncognitoButton extends St.Button {
@@ -251,6 +239,7 @@ let ClipboardDialog = class ClipboardDialog extends St.Widget {
 	ext;
 	_grab = null;
 	_open = false;
+	_closing = false;
 	_updateCursor = true;
 	_nextCursor = null;
 	_cursor = null;
@@ -283,7 +272,7 @@ let ClipboardDialog = class ClipboardDialog extends St.Widget {
 		// Dialog
 		this._dialog = new St.BoxLayout({
 			orientation: Clutter.Orientation.VERTICAL,
-			style_class: 'clipboard-dialog horizontal',
+			style_class: 'modal-dialog clipboard-dialog horizontal',
 			x_align: Clutter.ActorAlign.FILL,
 			y_align: Clutter.ActorAlign.CENTER,
 			x_expand: true,
@@ -387,13 +376,13 @@ let ClipboardDialog = class ClipboardDialog extends St.Widget {
 	}
 
 	open() {
-		if (this.opened) return;
+		if (this.opened || this._closing) return;
 		this._updateCursor = false;
 		this._nextCursor = this._cursor;
 		const grab = Main.pushModal(this, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
 
 		// GNOME 50 (Mutter 18) removed get_seat_state()/GrabState in favor of is_revoked()
-		const grabFailed = VERSION >= 50 ? grab.is_revoked() : grab.get_seat_state() !== Clutter.GrabState.ALL;
+		const grabFailed = VERSION >= 50 ? grab.is_revoked() : grab.get_seat_state() !== 3; // Clutter.GrabState.ALL
 		if (grabFailed) {
 			Main.popModal(grab);
 			return;
@@ -442,6 +431,7 @@ let ClipboardDialog = class ClipboardDialog extends St.Widget {
 
 	close() {
 		if (!this.opened) return;
+		this._closing = true;
 		this.opened = false;
 		this._updateCursor = true;
 		this._clipboardItemMenu.close();
@@ -480,6 +470,7 @@ let ClipboardDialog = class ClipboardDialog extends St.Widget {
 			onComplete: () => {
 				Main.popModal(this._grab);
 				this._grab = null;
+				this._closing = false;
 				this.hide();
 				global.compositor.enable_unredirect();
 			},
@@ -699,8 +690,10 @@ let ClipboardDialog = class ClipboardDialog extends St.Widget {
 			return this._header.searchEntry.clutter_text.event(event, false);
 		}
 
-		// Toggle pinned search: alt
-		if (key === Clutter.KEY_Alt_L || key === Clutter.KEY_Alt_R || key === Clutter.KEY_ISO_Level3_Shift) {
+		// Toggle pinned search
+		if (
+			this.ext.shortcutsManager?.getShortcutForKeyBinding(key, event.get_state()) === Shortcut.TogglePinnedSearch
+		) {
 			this._header.searchEntry.pinned = !this._header.searchEntry.pinned;
 			return Clutter.EVENT_STOP;
 		}
@@ -737,7 +730,45 @@ let ClipboardDialog = class ClipboardDialog extends St.Widget {
 		}
 
 		// Navigate
-		if (global.focus_manager.navigate_from_event(event)) return Clutter.EVENT_STOP;
+		// St.FocusManager.navigate_from_event was removed from St in GNOME 51
+		if (VERSION < 51 && global.focus_manager.navigate_from_event) {
+			if (global.focus_manager.navigate_from_event(event)) return Clutter.EVENT_STOP;
+		} else {
+			let direction;
+			switch (key) {
+				case Clutter.KEY_Up:
+				case Clutter.KEY_KP_Up:
+					direction = St.DirectionType.UP;
+					break;
+				case Clutter.KEY_Down:
+				case Clutter.KEY_KP_Down:
+					direction = St.DirectionType.DOWN;
+					break;
+				case Clutter.KEY_Left:
+				case Clutter.KEY_KP_Left:
+					direction = St.DirectionType.LEFT;
+					break;
+				case Clutter.KEY_Right:
+				case Clutter.KEY_KP_Right:
+					direction = St.DirectionType.RIGHT;
+					break;
+				case Clutter.KEY_Tab:
+				case Clutter.KEY_KP_Tab:
+					direction = event.has_shift_modifier()
+						? St.DirectionType.TAB_BACKWARD
+						: St.DirectionType.TAB_FORWARD;
+					break;
+				case Clutter.KEY_ISO_Left_Tab:
+					direction = St.DirectionType.TAB_BACKWARD;
+					break;
+			}
+			if (
+				direction !== undefined &&
+				this._dialog.navigate_focus(global.stage.get_key_focus(), direction, false)
+			) {
+				return Clutter.EVENT_STOP;
+			}
+		}
 		return super.vfunc_key_press_event(event);
 	}
 

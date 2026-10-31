@@ -1,22 +1,9 @@
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
+import { __decorate } from '../../thirdparty/tslib.js';
 import { ItemType } from '../common/constants.js';
 import { int32ParamSpec, registerClass } from '../common/gjs.js';
-
-var __decorate =
-	(this && this.__decorate) ||
-	function (decorators, target, key, desc) {
-		var c = arguments.length,
-			r = c < 3 ? target : desc === null ? (desc = Object.getOwnPropertyDescriptor(target, key)) : desc,
-			d;
-		if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-			r = Reflect.decorate(decorators, target, key, desc);
-		else
-			for (var i = decorators.length - 1; i >= 0; i--)
-				if ((d = decorators[i])) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-		return (c > 3 && r && Object.defineProperty(target, key, r), r);
-	};
 
 /**
  * File operation.
@@ -29,6 +16,9 @@ export const FileOperation = {
 /**
  * Clipboard entry.
  */
+const ClipboardEntrySignals = {
+	delete: {},
+};
 let ClipboardEntry = class ClipboardEntry extends GObject.Object {
 	_id;
 
@@ -61,9 +51,7 @@ ClipboardEntry = __decorate(
 				metadata: GObject.ParamSpec.jsobject('metadata', null, null, GObject.ParamFlags.READWRITE),
 				title: GObject.ParamSpec.string('title', null, null, GObject.ParamFlags.READWRITE, ''),
 			},
-			Signals: {
-				delete: {},
-			},
+			Signals: ClipboardEntrySignals,
 		}),
 	],
 	ClipboardEntry,
