@@ -3,8 +3,8 @@
 <wallpapers>
     <wallpaper deleted="false">
         <name>Spookymonth</name>
-        <filename>/usr/share/backgrounds/ArctineOS/futurecity_light.webp</filename>
-        <filename-dark>/usr/share/backgrounds/fedora-workstation/futurecity_dark.webp</filename-dark>
+        <filename>/usr/share/backgrounds/ArctineOS/spookymonth-bg-l.webp</filename>
+        <filename-dark>/usr/share/backgrounds/ArctineOS/spookymonth-bg-d.webp</filename-dark>
         <options>zoom</options>
         <author>Arctine Laboratories</author>
         <email>arctine@rootsource.cc</email>
