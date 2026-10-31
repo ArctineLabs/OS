@@ -65,8 +65,18 @@ RUN echo -e "\nIMAGE_VERSION=$(date +%y.%m)" >> /Arctine/Filesystem/Replace/usr/
 RUN source /Arctine/Filesystem/Replace/usr/lib/os-release && \
     sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=\"ArctineOS ${VERSION_ID} ${CODENAME}\"|" /Arctine/Filesystem/Replace/usr/lib/os-release
 
+# Nix
+RUN mkdir -p /nix
+RUN pacman -S --noconfirm nix
+RUN echo 'd /var/nix 0755 root root - -' > /usr/lib/tmpfiles.d/nix-storage.conf
+
+# Invoke filesystem file replacements
 RUN /Arctine/Scripts/hookhelper filesystem
 
+# Enable the nix daemon and mount
+RUN systemctl enable nix.mount nix-daemon.service
+
+# Homebrew
 COPY --from=ghcr.io/ublue-os/brew:latest /system_files /
 RUN --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
@@ -75,8 +85,12 @@ RUN --mount=type=cache,dst=/var/cache \
     /usr/bin/systemctl preset brew-update.timer && \
     /usr/bin/systemctl preset brew-upgrade.timer
 
+# Cleanup
 WORKDIR /
+RUN pacman -R mkinitcpio mkinitcpio-archiso --noconfirm
 RUN rm -rfv /milanium /airootfs
+
+# Permission setting
 RUN echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel && \
     chmod 440 /etc/sudoers.d/10-wheel && \
     visudo -c
@@ -84,14 +98,16 @@ RUN echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel && \
 RUN chmod 644 /etc/resolv.conf
 RUN chmod 644 /usr/share/gnome-background-properties/spookymonth.xml
 
-
 RUN chmod 4755 /usr/bin/newgidmap && \
     chmod 4755 /usr/bin/newuidmap
 
+# Locale generation
 RUN locale-gen
 
+# Enabling Network Manager
 RUN /usr/bin/systemctl enable NetworkManager
 
+# Making installer executable
 RUN chmod +x /Arctine/GumpackNG/*.sh
 
 # Either to be fixed, or to be completely removed.

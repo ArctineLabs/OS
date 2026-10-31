@@ -1,0 +1,14 @@
+[Unit]
+Description=Bind mount writable /var/nix directory to /nix
+Before=nix-daemon.service
+DefaultDependencies=no
+Conflicts=umount.target
+
+[Mount]
+What=/var/nix
+Where=/nix
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
