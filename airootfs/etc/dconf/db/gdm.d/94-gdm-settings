@@ -1,7 +1,7 @@
 #-------- Interface ---------
 [org/gnome/desktop/interface]
 #----------------------------
-accent-color='purple'
+accent-color='pink'
 cursor-theme='Adwaita'
 cursor-size=24
 icon-theme='Adwaita'

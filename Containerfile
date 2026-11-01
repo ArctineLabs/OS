@@ -68,8 +68,8 @@ RUN source /Arctine/Filesystem/Replace/usr/lib/os-release && \
 # Nix
 RUN mkdir -p /nix
 RUN pacman -S --noconfirm nix
-RUN echo 'd /var/nix 0755 root root - -' > /usr/lib/tmpfiles.d/nix-storage.conf
-
+RUN echo 'd /var/nix 0755 root root - -\nd /var/nix/store 1775 root root - -' \
+    > /usr/lib/tmpfiles.d/nix-storage.conf
 # Invoke filesystem file replacements
 RUN /Arctine/Scripts/hookhelper filesystem
 
