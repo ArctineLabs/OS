@@ -19,6 +19,7 @@ cloud-init
 cryptsetup
 curl
 darkhttpd
+dconf-editor
 ddrescue
 debugedit
 decibels
