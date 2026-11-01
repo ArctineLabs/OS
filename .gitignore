@@ -4,3 +4,4 @@ Ignore
 plus
 arctine-pkg/pkg
 arctine-pkg/*.zst
+cosign.key
