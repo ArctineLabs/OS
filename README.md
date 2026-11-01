@@ -68,6 +68,9 @@ The following files contain code derived from [bootcrew/mono](https://github.com
 - `scripts/build.sh`
 - `scripts/initramfs.sh`
 
+The following files contain code derived from [apollo-linux/apollo](https://github.com/apollo-linux/apollo) (Copyright 2025 tulilirockz, Apache License 2.0):
+- `.github/workflows/build-iso.yml` (partially)
+
 The following files contain code derived from [ArctineLabs/TyrianOS (sister project)](https://github.com/ArctineLabs/TyrianOS) (Copyright 2025 kevadesu, Apache License 2.0):
 - `.github/workflows/build.yml`
 - `.github/workflows/build-iso.yml` (partially)
