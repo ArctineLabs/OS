@@ -98,7 +98,6 @@ RUN echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel && \
     chmod 440 /etc/sudoers.d/10-wheel && \
     visudo -c
 
-RUN chmod 644 /etc/resolv.conf
 RUN chmod 644 /usr/share/gnome-background-properties/spookymonth.xml
 RUN chmod 644 /usr/share/gnome-background-properties/kariya.xml
 
@@ -114,6 +113,9 @@ RUN locale-gen
 
 # Enabling Network Manager
 RUN /usr/bin/systemctl enable NetworkManager
+
+# Fixing resolv.conf permissions
+RUN chmod 644 /etc/resolv.conf
 
 # Making installer executable
 RUN chmod +x /Arctine/GumpackNG/*.sh
