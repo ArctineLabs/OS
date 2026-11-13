@@ -120,6 +120,10 @@ RUN chmod 644 /etc/resolv.conf
 # Making installer executable
 RUN chmod +x /Arctine/GumpackNG/*.sh
 
+# Fixes
+## Distrobox create
+RUN sudo sed -i 's/rslave=":rslave"/rslave=",rslave"/' /usr/bin/distrobox-create
+
 # Either to be fixed, or to be completely removed.
 # RUN mkdir -p /usr/lib/bootupd/updates /usr/lib/bootupd/components /boot/efi /boot/grub
 # RUN if [ -d /usr/share/grub ]; then cp -r /usr/share/grub/* /boot/grub/ || true; fi
